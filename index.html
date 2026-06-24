@@ -496,6 +496,13 @@
       box-shadow: 0 0 0 3px rgba(61, 139, 90, 0.22), 0 18px 26px rgba(23, 35, 29, 0.2);
     }
 
+    .policy-tile:disabled {
+      cursor: not-allowed;
+      opacity: 0.48;
+      transform: none;
+      box-shadow: none;
+    }
+
     .tile-char {
       display: block;
       margin: 4px auto 8px;
@@ -679,13 +686,13 @@
     .result {
       display: grid;
       place-items: center;
-      padding: 32px;
+      padding: 18px;
       background: #f2eadc;
     }
 
     .result-card {
       width: min(1040px, 100%);
-      padding: 28px;
+      padding: 18px;
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: var(--paper);
@@ -693,59 +700,49 @@
     }
 
     .result-card h2 {
-      margin: 8px 0 10px;
-      font-size: clamp(28px, 5vw, 52px);
+      margin: 4px 0 6px;
+      font-size: clamp(24px, 4vw, 42px);
       line-height: 1.1;
     }
 
     .result-card p {
       color: var(--muted);
-      line-height: 1.7;
+      line-height: 1.55;
+    }
+
+    .result-rarity {
+      display: inline-block;
+      margin-bottom: 6px;
+      color: var(--green);
+      font-size: 13px;
+      font-weight: 950;
     }
 
     .result-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
-      margin: 20px 0;
+      margin: 10px 0;
     }
 
     .result-stat {
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: #fff;
-      padding: 12px;
+      padding: 9px;
     }
 
     .result-stat strong {
       display: block;
       color: var(--green);
-      font-size: 28px;
-    }
-
-    .log-list {
-      display: grid;
-      gap: 8px;
-      max-height: 240px;
-      overflow: auto;
-      margin: 16px 0;
-    }
-
-    .log-item {
-      border-left: 5px solid var(--green);
-      background: #fff;
-      border-radius: var(--radius);
-      padding: 10px 12px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.5;
+      font-size: 22px;
     }
 
     .result-tools {
       display: grid;
       grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
       gap: 14px;
-      margin: 18px 0;
+      margin: 10px 0 0;
     }
 
     .prompt-box,
@@ -753,7 +750,7 @@
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: #fff;
-      padding: 14px;
+      padding: 10px;
     }
 
     .prompt-box h3,
@@ -769,7 +766,8 @@
 
     .prompt-textarea {
       width: 100%;
-      min-height: 190px;
+      height: 160px;
+      min-height: 130px;
       resize: vertical;
       border: 1px solid var(--line);
       border-radius: var(--radius);
@@ -941,7 +939,7 @@
           <div class="tile-hand" id="policyHand"></div>
           <div class="control-row">
             <button class="small-btn" onclick="resetGame()">重新開始</button>
-            <button class="play-btn" onclick="playTurn()">確認選擇</button>
+            <button class="play-btn" onclick="playTurn()">下一步</button>
           </div>
         </div>
       </section>
@@ -952,8 +950,9 @@
     <div class="result-card">
       <div class="brand-kicker">POLICY RESULT</div>
       <h2 id="resultTitle">測驗結果</h2>
+      <span class="result-rarity" id="resultRarity">結局稀有度 0%</span>
       <p id="resultText"></p>
-      <h3>Agent 最終期望度</h3>
+      <h3>都市的聲音</h3>
       <div class="result-grid" id="resultAgents"></div>
       <div class="result-tools">
         <section class="prompt-box">
@@ -973,11 +972,9 @@
             <button class="share-btn" onclick="shareResult('instagram')">Instagram</button>
           </div>
           <div class="tool-feedback" id="shareFeedback"></div>
+          <button class="restart-btn" onclick="resetGame()">再玩一次</button>
         </section>
       </div>
-      <h3>回合摘要</h3>
-      <div class="log-list" id="resultLog"></div>
-      <button class="restart-btn" onclick="resetGame()">重新開局</button>
     </div>
   </section>
 
@@ -985,87 +982,80 @@
     const eventFlow = [
       {
         stage: "都市願景",
-        eventType: "起手式",
-        title: "第一局：你要把綠廊推向哪種城市想像？",
-        text: "這個選擇會決定後續事件被解讀的基調。它不是單純美化工程，而是先設定政策敘事。",
-        agent: "媒體與居民都在等待市府先說清楚：綠廊到底是景觀、交通、商業，還是社區生活政策？",
+        eventType: "願景",
+        title: "第一局：綠廊要先成為什麼樣的城市空間？",
+        text: "第一層會設定後續政策的基調：休憩、商業或交通，各自會帶來不同族群期待與壓力。",
+        agent: "玩家要在有限 cost 裡決定綠廊最先被誰看見、誰使用，以及誰開始感到壓力。",
         options: [
-          { key: "vision_park", char: "景", title: "景觀公園型", desc: "先把綠廊做成城市門面。", delta: { green: 8, usage: 3, housing: 4, media: 4 } },
-          { key: "vision_mobility", char: "行", title: "交通轉型型", desc: "優先處理步行與自行車。", delta: { mobility: 9, usage: 3, safety: -1, media: 2 } },
-          { key: "vision_commerce", char: "市", title: "商業活化型", desc: "用人潮帶動地方經濟。", delta: { usage: 8, housing: 5, media: 6, budget: -2 } },
-          { key: "vision_community", char: "里", title: "社區共存型", desc: "把安全與地方生活放前面。", delta: { trust: 8, safety: 5, media: -2, usage: 2 } }
+          { key: "vision_rest", char: "憩", title: "景觀休憩", desc: "先提供可停留的日常綠地。", cost: 1, delta: { moveSafety: 0, maintenanceTrust: 1, gentrificationPressure: 1 } },
+          { key: "vision_commerce_v4", char: "市", title: "商業活化", desc: "用人潮與店家創造街區熱度。", cost: 2, delta: { moveSafety: 1, maintenanceTrust: 0, gentrificationPressure: 2 } },
+          { key: "vision_mobility_v4", char: "行", title: "交通轉化", desc: "把綠廊視為移動基礎設施。", cost: 3, delta: { moveSafety: 2, maintenanceTrust: 0, gentrificationPressure: 0 } },
+          { key: "gag_pool_l1", char: "泳", title: "大游泳池", desc: "把綠廊直接挖成城市泳池。", cost: 10, gagSeries: "pool", delta: {} }
         ]
       },
       {
-        stage: "事件 A：植栽願景",
-        eventType: "植栽事件 A1",
-        title: "第二局：植栽要先服務誰？",
-        text: "綠廊的植栽不是只有美觀，它會影響遮蔭、維護、安全死角與居民使用習慣。",
-        agent: "高齡居民重視陰影與好走，學生在意停留感，店家則會注意招牌與視線是否被遮住。",
+        stage: "景觀願景",
+        eventType: "景觀",
+        title: "第二局：開放空間要長成什麼樣子？",
+        text: "景觀不是只看美感，空曠、密植或低矮設計會影響夜間安全、維護信任與未來開發想像。",
+        agent: "學生在意能不能安全通過，高齡居民在意視線與維護，在地青年會留意環境改善是否轉成價格壓力。",
         options: [
-          { key: "plant_shade", char: "蔭", title: "遮蔭優先", desc: "提高日常步行舒適度。", delta: { green: 10, usage: 6, safety: 1, budget: -5 } },
-          { key: "plant_native", char: "本", title: "原生植栽", desc: "強調生態與維護合理性。", delta: { green: 8, trust: 4, media: 2, budget: -4 } },
-          { key: "plant_landmark", char: "花", title: "景觀花帶", desc: "提高辨識度與打卡聲量。", delta: { green: 7, media: 7, housing: 4, budget: -4 } }
+          { key: "landscape_plaza", char: "場", title: "空曠廣場", desc: "保留開放視野與彈性使用。", cost: 1, delta: { moveSafety: -1, maintenanceTrust: -1, gentrificationPressure: 0 } },
+          { key: "landscape_tall_trees", char: "森", title: "很多高大的樹", desc: "快速形成濃密綠廊效果。", cost: 2, delta: { moveSafety: -1, maintenanceTrust: -1, gentrificationPressure: 1 } },
+          { key: "landscape_low_plants", char: "花", title: "低矮草和花", desc: "維持視線並保留景觀感。", cost: 3, delta: { moveSafety: 1, maintenanceTrust: 1, gentrificationPressure: 1 } },
+          { key: "gag_pool_l2", char: "泳", title: "大游泳池", desc: "把第二段也延伸成水域景觀。", cost: 10, gagSeries: "pool", delta: {} }
         ]
       },
       {
-        stage: "事件 A：植栽設計",
-        eventType: "植栽事件 A2",
-        title: "第三局：植栽設計要如何處理風險？",
-        text: "樹蔭變多後，維護、照明遮蔽、蚊蟲與視線死角會開始進入公共討論。",
-        agent: "這一局會決定植栽是被看成公共舒適，還是被批評為後續管理負擔。",
+        stage: "景觀維護",
+        eventType: "維護",
+        title: "第三局：景觀後續要怎麼被照顧？",
+        text: "維護方式會決定居民是否感覺到政策被持續照顧，而不是完工後就被留在原地。",
+        agent: "這一局特別影響高齡居民對樹種、落葉、排水與管理責任的信任。",
         options: [
-          { key: "plant_open", char: "透", title: "低矮通透", desc: "減少死角，保留視線。", delta: { safety: 8, trust: 3, green: 2, budget: -4 } },
-          { key: "plant_dense", char: "森", title: "密植綠廊", desc: "強化沈浸感與遮蔭。", delta: { green: 11, usage: 3, safety: -5, housing: 4, budget: -6 } },
-          { key: "plant_maintain", char: "修", title: "維護契約", desc: "先公開修剪與清潔責任。", delta: { trust: 8, safety: 4, green: 3, budget: -7 } }
+          { key: "maintenance_plaza", char: "廣", title: "廣場維護", desc: "用最低限度維持基本整潔。", cost: 1, delta: { moveSafety: 0, maintenanceTrust: -1, gentrificationPressure: 0 } },
+          { key: "maintenance_flat", char: "平", title: "扁平單一植栽", desc: "降低管理複雜度與視線死角。", cost: 2, delta: { moveSafety: 0, maintenanceTrust: 1, gentrificationPressure: 0 } },
+          { key: "maintenance_ecology", char: "生", title: "自然生態圈", desc: "提高生態感與區域吸引力。", cost: 3, delta: { moveSafety: 0, maintenanceTrust: 0, gentrificationPressure: 1 } },
+          { key: "gag_pool_l3", char: "池", title: "大游泳池維護", desc: "讓維護團隊改成水質管理隊。", cost: 10, gagSeries: "pool", delta: {} }
         ]
       },
       {
-        stage: "事件 B：交通政策",
-        eventType: "交通事件 B1",
-        title: "第四局：交通政策要主打哪一種日常？",
-        text: "如果綠廊不能銜接真實路口與通勤節點，它就容易停留在景觀公園。",
-        agent: "學生與通勤族會看它能不能真的縮短日常路徑，家庭則會先看安全與人車分流。",
+        stage: "交通政策",
+        eventType: "交通",
+        title: "第四局：綠廊要優先服務哪種移動？",
+        text: "交通政策會決定綠廊是維持車行效率、轉向步行自行車，還是折衷混合。",
+        agent: "學生最在意移動安全與效率；長輩在意是否被車流或新交通工具嚇到。",
         options: [
-          { key: "traffic_bike", char: "騎", title: "自行車優先", desc: "打造連續自行車路徑。", delta: { mobility: 12, usage: 5, safety: -3, budget: -6 } },
-          { key: "traffic_walk", char: "步", title: "步行優先", desc: "改善人行穿越與停留。", delta: { mobility: 7, usage: 5, safety: 4, budget: -5 } },
-          { key: "traffic_transit", char: "轉", title: "轉乘節點", desc: "串接車站、公車與生活圈。", delta: { mobility: 10, usage: 6, media: 3, budget: -7 } }
+          { key: "traffic_vehicle", char: "車", title: "汽機車", desc: "維持既有車行與停車便利。", cost: 1, delta: { moveSafety: -1, maintenanceTrust: 0, gentrificationPressure: 0 } },
+          { key: "traffic_walk_bike", char: "步", title: "自行車步行優先", desc: "把日常慢行放在道路設計前面。", cost: 2, delta: { moveSafety: 2, maintenanceTrust: 0, gentrificationPressure: 1 } },
+          { key: "traffic_mixed", char: "混", title: "混合", desc: "保留多種交通使用彈性。", cost: 3, delta: { moveSafety: 1, maintenanceTrust: 0, gentrificationPressure: 0 } },
+          { key: "gag_segway_l4", char: "衡", title: "電動平衡車", desc: "把科技感交通工具推成亮點。", cost: 10, gagSeries: "segway", delta: {} }
         ]
       },
       {
-        stage: "事件 B：交通設計",
-        eventType: "交通事件 B2",
-        title: "第五局：路口與動線要怎麼設計？",
-        text: "交通政策會在路口被檢驗。標線、照明、轉角視距與人車分流會改變使用者信心。",
-        agent: "媒體很容易把單一路口事故放大成整體規劃失敗，因此細部設計會影響政策信任。",
+        stage: "交通設計",
+        eventType: "路口",
+        title: "第五局：街廓與路口要怎麼重新分配？",
+        text: "細部交通設計會影響衝突風險、長輩步行感受，也可能讓高投資基建轉成開發訊號。",
+        agent: "交通改善越明確，越可能提高安全感；但投資強度也可能提高仕紳化壓力。",
         options: [
-          { key: "traffic_separate", char: "分", title: "人車分流", desc: "降低衝突，提高安全感。", delta: { safety: 9, mobility: 5, trust: 3, budget: -7 } },
-          { key: "traffic_sign", char: "線", title: "標線導引", desc: "快速補強辨識與方向。", delta: { mobility: 6, safety: 4, budget: -3 } },
-          { key: "traffic_slow", char: "慢", title: "減速街廓", desc: "讓車速配合綠廊生活圈。", delta: { safety: 8, trust: 4, mobility: 2, media: 2, budget: -6 } }
+          { key: "design_slow", char: "慢", title: "減速街廓", desc: "降低車速，維持生活街區節奏。", cost: 1, delta: { moveSafety: 0, maintenanceTrust: 0, gentrificationPressure: 0 } },
+          { key: "design_walk_limit", char: "徒", title: "嚴格徒步限制", desc: "用明確規範減少人車衝突。", cost: 2, delta: { moveSafety: 1, maintenanceTrust: 1, gentrificationPressure: 0 } },
+          { key: "design_separate", char: "分", title: "人車分流", desc: "投入較高成本做完整基建。", cost: 3, delta: { moveSafety: 1, maintenanceTrust: 1, gentrificationPressure: 2 } },
+          { key: "gag_segway_l5", char: "道", title: "電動平衡車專用道", desc: "替平衡車畫出專屬城市賽道。", cost: 10, gagSeries: "segway", delta: {} }
         ]
       },
       {
-        stage: "事件 C：房價定位",
-        eventType: "房價事件 C1",
-        title: "第六局：綠廊帶來增值時，政策要怎麼說？",
-        text: "綠廊形象會被房地產市場吸收。這一局要決定政府如何面對增值與排擠的雙重敘事。",
-        agent: "自有住宅者可能支持資產保值，租屋青年與初入職場者會擔心生活圈被重新定價。",
+        stage: "房價政策",
+        eventType: "居住",
+        title: "第六局：房價與開發壓力要怎麼處理？",
+        text: "最後一層不是直接選結局，而是選擇房價政策槓桿，決定熱度、保障與開發之間的關係。",
+        agent: "在地青年居民會追問：這條綠廊是讓人留下來，還是把地方重新定價？",
         options: [
-          { key: "housing_value", char: "值", title: "城市增值", desc: "承認綠廊提升區域價值。", delta: { housing: 10, media: 6, trust: -2, budget: 2 } },
-          { key: "housing_warning", char: "警", title: "租金預警", desc: "公開指出排擠風險。", delta: { housing: -5, trust: 6, media: 4, budget: -3 } },
-          { key: "housing_data", char: "數", title: "房價監測", desc: "用資料追蹤沿線壓力。", delta: { trust: 5, media: 3, housing: -2, budget: -4 } }
-        ]
-      },
-      {
-        stage: "事件 C：居住回應",
-        eventType: "房價事件 C2",
-        title: "第七局：最後要如何回應居住壓力？",
-        text: "如果綠廊只創造環境紅利，政治回饋可能轉向分配衝突。最後一局決定成果能不能被更多人共享。",
-        agent: "青年家庭、租屋族與在地居民都會看政策是否有實際配套，而不是只停在口號。",
-        options: [
-          { key: "housing_social", char: "社", title: "社宅串接", desc: "把小東社宅等節點納入綠廊敘事。", delta: { housing: -9, trust: 7, usage: 3, budget: -8 } },
-          { key: "housing_rent", char: "租", title: "租金支持", desc: "回應青年與弱勢排擠。", delta: { housing: -11, trust: 6, media: 3, budget: -9 } },
-          { key: "housing_business", char: "店", title: "在地店家", desc: "扶持原有商家共享人潮。", delta: { usage: 6, trust: 4, housing: -3, media: 4, budget: -5 } }
+          { key: "housing_market", char: "市", title: "市場自然發展", desc: "讓周邊價值由市場自行反映。", cost: 1, delta: { moveSafety: 0, maintenanceTrust: 0, gentrificationPressure: 1 } },
+          { key: "housing_justice", char: "居", title: "居住正義保障", desc: "用配套對沖租金與排擠風險。", cost: 2, delta: { moveSafety: 1, maintenanceTrust: 1, gentrificationPressure: -2 } },
+          { key: "housing_development", char: "招", title: "招商開發優先", desc: "把綠廊作為大型投資入口。", cost: 3, delta: { moveSafety: 0, maintenanceTrust: 0, gentrificationPressure: 3 } },
+          { key: "gag_cyber_l6", char: "樓", title: "賽博龐克大樓", desc: "用未來感大樓一次改寫天際線。", cost: 10, gagSeries: "cyber", delta: {} }
         ]
       }
     ];
@@ -1076,15 +1066,14 @@
     const logs = [];
     const path = [];
 
+    const totalCost = 15;
+
     const state = {
-      green: 50,
-      mobility: 50,
-      usage: 45,
-      housing: 35,
-      safety: 55,
-      trust: 50,
-      media: 40,
-      budget: 60
+      moveSafety: 0,
+      maintenanceTrust: 0,
+      gentrificationPressure: 0,
+      costSpent: 0,
+      gagSeries: null
     };
 
     const initialState = { ...state };
@@ -1095,28 +1084,28 @@
         name: "輿論報導",
         emoji: "🕵️‍♀️",
         baseline: "關注政策能否被說清楚，也會放大爭議、衝突與公共利益。",
-        weights: { media: 0.9, trust: 0.45, housing: -0.45, safety: 0.25, usage: 0.25, budget: 0.1, green: 0.15, mobility: 0.25 }
+        weights: { moveSafety: 0.25, maintenanceTrust: -0.1, gentrificationPressure: 0.55 }
       },
       {
         key: "student",
         name: "青年短居學生",
         emoji: "🧑‍🎓",
         baseline: "重視租金、通勤、自行車、夜間安全，以及低成本公共空間。",
-        weights: { mobility: 0.65, usage: 0.45, housing: -0.8, safety: 0.45, trust: 0.2, budget: 0.05, green: 0.25, media: 0.05 }
+        weights: { moveSafety: 1.2, maintenanceTrust: 0.1, gentrificationPressure: -0.45 }
       },
       {
         key: "youngLocal",
         name: "青年在地居民",
         emoji: "👨‍👩‍👧",
         baseline: "同時在意通勤、生活機能、育兒安全、房價租金與長期居住壓力。",
-        weights: { usage: 0.55, safety: 0.6, trust: 0.45, housing: -0.75, mobility: 0.45, budget: 0.1, green: 0.2, media: 0.05 }
+        weights: { moveSafety: 0.35, maintenanceTrust: 0.25, gentrificationPressure: -1 }
       },
       {
         key: "elder",
         name: "高齡在地居民",
         emoji: "👴",
         baseline: "重視熟悉路徑、遮蔭、座椅、照明、無障礙、安全與維護。",
-        weights: { safety: 0.85, trust: 0.55, usage: 0.3, green: 0.2, mobility: 0.1, housing: 0.05, budget: 0.05, media: -0.1 }
+        weights: { moveSafety: 0.2, maintenanceTrust: 1.15, gentrificationPressure: 0.05 }
       }
     ];
 
@@ -1167,6 +1156,150 @@
     };
 
     const reactionCopy = {
+      vision_rest: {
+        media: ["景觀休憩容易有好看的畫面，但會被追問是不是只有門面。", ["景觀", "公共空間"]],
+        student: ["有地方坐一下不錯，但我還是會先看好不好走、晚上安不安全。", ["停留", "夜間安全"]],
+        youngLocal: ["休憩空間能改善日常，但也要看會不會慢慢帶動周邊價格。", ["生活品質", "房價"]],
+        elder: ["有地方休息是好事，重點是樹蔭、座椅和照明要照顧到。", ["休息", "照明"]]
+      },
+      vision_commerce_v4: {
+        media: ["商業活化很容易有聲量，也很容易被連到房價和招商爭議。", ["商業", "房價"]],
+        student: ["店變多可能方便，但如果消費和租金都變貴就會很有感。", ["消費", "租金"]],
+        youngLocal: ["人潮可以帶動店家，但我會擔心停車、租金和原本商圈被排擠。", ["商圈", "居住壓力"]],
+        elder: ["熱鬧可以，但不要吵到生活，也不要讓平常走路變複雜。", ["日常", "安穩"]]
+      },
+      vision_mobility_v4: {
+        media: ["交通轉化有公共利益，但最後會被檢驗是不是真的接上日常路線。", ["交通", "日常"]],
+        student: ["如果能接到學校和車站，這會比單純漂亮更實用。", ["通勤", "轉乘"]],
+        youngLocal: ["通勤變順是好事，但要一起處理停車和親子安全。", ["通勤", "安全"]],
+        elder: ["路線變多可以，但標示要清楚，不能讓老人家看不懂。", ["標示", "通行"]]
+      },
+      gag_pool_l1: {
+        media: ["這張圖一定會爆紅，但留言大概會開始問誰要負責水質。", ["炎上", "荒謬"]],
+        student: ["聽起來很酷，但我只是想安全到學校，不是每天路過泳池。", ["通勤", "吐槽"]],
+        youngLocal: ["如果預算都拿去挖泳池，停車和房價問題誰處理？", ["預算", "生活壓力"]],
+        elder: ["水池沒顧好會有蚊子，老人家不一定敢靠近。", ["維護", "蚊蟲"]]
+      },
+      landscape_plaza: {
+        media: ["空曠廣場看起來乾淨，但夏天沒遮蔭很快會被吐槽。", ["廣場", "遮蔭"]],
+        student: ["太空曠的話白天很曬，晚上也不一定有安全感。", ["遮蔭", "安全"]],
+        youngLocal: ["彈性空間可以辦活動，但平常到底誰會用還要觀察。", ["活動", "日常"]],
+        elder: ["沒有樹蔭和椅子，老人家很難待太久。", ["遮蔭", "座椅"]]
+      },
+      landscape_tall_trees: {
+        media: ["很多大樹的照片會很好看，但維護和夜間視線會被追問。", ["綠廊", "維護"]],
+        student: ["有樹蔭很好，但如果晚上太暗、看不到來車就麻煩。", ["夜間安全", "視線"]],
+        youngLocal: ["景觀加分，但也會讓人開始想像周邊房價是不是要漲。", ["景觀", "房價"]],
+        elder: ["樹太密會擋視線，落葉誰掃也要先講清楚。", ["視線", "落葉"]]
+      },
+      landscape_low_plants: {
+        media: ["低矮植栽比較不轟動，但看起來像是有考慮安全和維護。", ["安全", "維護"]],
+        student: ["視線清楚比較安心，但還是希望有一點遮蔭。", ["視線", "遮蔭"]],
+        youngLocal: ["這種設計比較穩，不會只有拍照效果，也比較適合日常。", ["日常", "安全"]],
+        elder: ["看得到路和來車，走起來會比較放心。", ["視線", "安心"]]
+      },
+      gag_pool_l2: {
+        media: ["第二段也做泳池，網路一定會開始做迷因。", ["迷因", "政策"]],
+        student: ["游泳池離我的通勤需求真的有點遠。", ["通勤", "無感"]],
+        youngLocal: ["這種亮點很吸睛，但生活問題好像被放旁邊了。", ["生活機能", "疑慮"]],
+        elder: ["水邊地面如果濕滑，老人家會更怕跌倒。", ["防滑", "安全"]]
+      },
+      maintenance_plaza: {
+        media: ["最低限度維護不太會有亮點，但出事時也很難說服大家。", ["維護", "信任"]],
+        student: ["只要不要髒亂還可以，但對通勤幫助有限。", ["使用", "通勤"]],
+        youngLocal: ["基本維護可以，但很難讓人感覺生活品質真的變好。", ["維護", "生活品質"]],
+        elder: ["只有基本清潔不夠，排水、座椅和路面還是要顧。", ["排水", "路面"]]
+      },
+      maintenance_flat: {
+        media: ["單一植栽不一定有話題，但比較像務實維護。", ["植栽", "務實"]],
+        student: ["至少路線清楚、不容易變死角，這點有幫助。", ["視線", "安全"]],
+        youngLocal: ["維護簡單比較穩，之後不容易變成管理負擔。", ["管理", "日常"]],
+        elder: ["好整理、看得清楚，對每天走的人比較實在。", ["維護", "視線"]]
+      },
+      maintenance_ecology: {
+        media: ["自然生態圈有故事性，但會被問蚊蟲和維護怎麼辦。", ["生態", "維護"]],
+        student: ["如果變得太自然，晚上會不會比較暗、比較難走？", ["夜間安全", "路徑"]],
+        youngLocal: ["環境變好會加分，但也可能變成新的房價賣點。", ["環境", "房價"]],
+        elder: ["自然可以，但不能變成蚊蟲多、沒人整理。", ["蚊蟲", "維護"]]
+      },
+      gag_pool_l3: {
+        media: ["游泳池維護聽起來就會變成新聞標題。", ["新聞", "維護"]],
+        student: ["我比較想要 YouBike 位子，不是水質公告。", ["YouBike", "吐槽"]],
+        youngLocal: ["維護費如果燒在泳池，居民會想問其他配套在哪。", ["成本", "配套"]],
+        elder: ["水池要是沒人顧，最後麻煩的一定是附近居民。", ["維護", "居民負擔"]]
+      },
+      traffic_vehicle: {
+        media: ["維持汽機車方便比較保守，但很難說服慢行支持者。", ["車流", "保守"]],
+        student: ["如果還是車優先，騎車和走路的安全感不會變太多。", ["通勤", "安全"]],
+        youngLocal: ["停車方便是現實需求，但小孩和行人安全也不能忽略。", ["停車", "行人"]],
+        elder: ["車太多的地方，老人家過馬路還是會緊張。", ["過馬路", "安全"]]
+      },
+      traffic_walk_bike: {
+        media: ["自行車步行優先會有轉型感，但路權分配會被討論。", ["慢行", "路權"]],
+        student: ["這比較接近我的需求，重點是路線要連續、晚上要亮。", ["自行車", "照明"]],
+        youngLocal: ["慢行友善很好，但不要讓停車和接送變得更混亂。", ["停車", "接送"]],
+        elder: ["走路空間變好可以，但自行車速度要管。", ["步行", "速度"]]
+      },
+      traffic_mixed: {
+        media: ["混合方案聽起來折衷，但也容易被說什麼都沒優先。", ["折衷", "交通"]],
+        student: ["可以混合，但如果每種都一點點，最後可能還是不順。", ["通勤", "折衷"]],
+        youngLocal: ["保留彈性不錯，但路口規則要夠清楚。", ["路口", "規則"]],
+        elder: ["只要標示清楚、車速慢，混合也不是不行。", ["標示", "安全"]]
+      },
+      gag_segway_l4: {
+        media: ["電動平衡車很有話題，但更像短影音題材。", ["科技", "話題"]],
+        student: ["聽起來潮，但我要去哪借、去哪停？", ["使用情境", "停放"]],
+        youngLocal: ["新的車種進來，行人和小孩會不會更危險？", ["安全", "路權"]],
+        elder: ["那種車滑來滑去，老人家會怕。", ["安全", "不安"]]
+      },
+      design_slow: {
+        media: ["減速街廓是低成本穩健方案，但聲量不會太高。", ["減速", "生活圈"]],
+        student: ["車慢一點比較安全，但通勤效率不一定提升。", ["安全", "通勤"]],
+        youngLocal: ["住宅和學校附近減速，至少生活壓力會小一點。", ["住宅", "安全"]],
+        elder: ["車慢下來，過馬路就比較安心。", ["過馬路", "安心"]]
+      },
+      design_walk_limit: {
+        media: ["嚴格徒步限制會被支持安全的人稱讚，也會被問執法細節。", ["徒步", "執法"]],
+        student: ["走路安全會變好，但要確認自行車路線不會被切斷。", ["步行", "自行車"]],
+        youngLocal: ["規則清楚有幫助，但要看接送和停車怎麼配合。", ["規則", "接送"]],
+        elder: ["人走人的地方，老人家會比較敢慢慢走。", ["步行", "安全"]]
+      },
+      design_separate: {
+        media: ["人車分流最能回應安全疑慮，也最像一筆大型投資。", ["分流", "投資"]],
+        student: ["分流做好，騎車和走路都會更安心。", ["分流", "通勤"]],
+        youngLocal: ["安全提升很好，但高規格建設也可能推高周邊期待和房價。", ["安全", "房價"]],
+        elder: ["人車分開走，對長輩比較清楚也比較安全。", ["安全", "清楚"]]
+      },
+      gag_segway_l5: {
+        media: ["專用道一出來，討論大概會從政策變成笑話。", ["專用道", "迷因"]],
+        student: ["如果不是大家都能用，專用道就很尷尬。", ["公平", "使用"]],
+        youngLocal: ["多一條奇怪專用道，不如先把人行道做好。", ["人行道", "優先順序"]],
+        elder: ["我只希望走路不要被嚇到，不需要那麼多花樣。", ["步行", "安全"]]
+      },
+      housing_market: {
+        media: ["市場自然發展會讓房價話題自己發酵。", ["市場", "房價"]],
+        student: ["如果都交給市場，租金變貴時學生會很有感。", ["租金", "學生"]],
+        youngLocal: ["自然發展聽起來輕鬆，但壓力最後可能是居民承擔。", ["房價", "居民"]],
+        elder: ["房子保值是好事，但生活不要因此變得不方便。", ["資產", "生活"]]
+      },
+      housing_justice: {
+        media: ["居住正義保障能把討論從招商拉回公共利益。", ["居住", "公平"]],
+        student: ["至少政策有看到租屋族，不是只看建案和人潮。", ["租金", "公平"]],
+        youngLocal: ["如果真的有保障，會讓想留下來的人比較安心。", ["留下", "配套"]],
+        elder: ["年輕人住得下來，社區才會比較有活力。", ["社區", "青年"]]
+      },
+      housing_development: {
+        media: ["招商開發優先很有聲量，但仕紳化爭議也會直接升高。", ["招商", "仕紳化"]],
+        student: ["這聽起來就是之後消費和租金都會變貴。", ["租金", "消費"]],
+        youngLocal: ["開發可以熱鬧，但原本住在這裡的人能不能留下來？", ["開發", "居住"]],
+        elder: ["太多新商業進來，生活路徑可能會變得不熟悉。", ["商業", "日常"]]
+      },
+      gag_cyber_l6: {
+        media: ["效果圖會很美，但大家會問現實到底有誰要進駐。", ["效果圖", "招商"]],
+        student: ["賽博龐克大樓很酷，但跟我的租金和通勤有什麼關係？", ["租金", "通勤"]],
+        youngLocal: ["如果只是大型開發想像，反而離在地生活更遠。", ["開發", "在地"]],
+        elder: ["大樓再漂亮，也要看附近居民平常用不用得到。", ["日常", "距離"]]
+      },
       vision_park: {
         media: ["景觀門面容易形成正面聲量，但後續會被追問是否只是形象工程。", ["景觀", "輿論"]],
         student: ["漂亮是加分，但如果不好走、不好騎，對我來說就只是拍照點。", ["公共空間", "通勤"]],
@@ -1306,11 +1439,26 @@
     }
 
     function applyDelta(key, value) {
-      state[key] = clamp(state[key] + value);
+      state[key] = (state[key] || 0) + value;
     }
 
     function currentNode() {
       return eventFlow[Math.min(turn - 1, maxTurns - 1)];
+    }
+
+    function remainingCost() {
+      return totalCost - state.costSpent;
+    }
+
+    function canAfford(option) {
+      return option.cost <= remainingCost();
+    }
+
+    function ensureAffordableSelection() {
+      const selected = getOption(selectedPolicy);
+      if (selected && canAfford(selected)) return;
+      const fallback = currentNode().options.find(option => canAfford(option));
+      selectedPolicy = fallback ? fallback.key : null;
     }
 
     function renderMapLayer() {
@@ -1344,17 +1492,22 @@
 
     function renderPolicyHand() {
       const node = currentNode();
+      ensureAffordableSelection();
       document.getElementById("policyHand").innerHTML = node.options.map(option => `
-        <button class="policy-tile ${option.key === selectedPolicy ? "active" : ""}" onclick="selectPolicy('${option.key}')">
+        <button class="policy-tile ${option.key === selectedPolicy ? "active" : ""}" onclick="selectPolicy('${option.key}')" ${canAfford(option) ? "" : "disabled"}>
           <span class="tile-char">${option.char}</span>
           <strong>${option.title}</strong>
-          <small>${option.desc}</small>
+          <small>cost ${option.cost}｜${option.desc}</small>
         </button>
       `).join("");
-      document.getElementById("selectedTag").textContent = `目前選擇：${getOption(selectedPolicy).title}`;
+      document.getElementById("selectedTag").textContent = `剩餘 cost:${remainingCost()}`;
     }
 
     function getAgentScore(agent, option) {
+      if (option.gagSeries) {
+        const gagScores = { media: 8, student: -3, youngLocal: -5, elder: -5 };
+        return gagScores[agent.key] || 0;
+      }
       return Math.round(Object.entries(option.delta).reduce((total, [key, value]) => {
         return total + (agent.weights[key] || 0) * value;
       }, 0));
@@ -1382,6 +1535,27 @@
     }
 
     function renderAgentWall(option = getOption(selectedPolicy), mode = "preview") {
+      if (!option) {
+        document.getElementById("agentPhase").textContent = "無可選政策";
+        document.getElementById("agentWall").innerHTML = agents.map(agent => `
+          <article class="agent-card neutral">
+            <div class="agent-avatar" aria-hidden="true">${agent.emoji}</div>
+            <div class="agent-speech">
+              <div class="agent-top">
+                <div class="agent-title">
+                  <div class="agent-name">${agent.name}</div>
+                </div>
+                <div class="agent-status">
+                  <small class="agent-score">期望度：${agentState[agent.key]}</small>
+                  <span class="agent-emotion neutral">觀望 →0</span>
+                </div>
+              </div>
+              <p>「本輪 cost 已不足，沒有新的政策牌可執行。」</p>
+            </div>
+          </article>
+        `).join("");
+        return;
+      }
       const reactions = agents.map(agent => getReaction(agent, option));
       document.getElementById("agentPhase").textContent = mode === "committed" ? "本輪反應" : "選擇預覽";
       document.getElementById("agentWall").innerHTML = reactions.map(reaction => `
@@ -1423,6 +1597,8 @@
     }
 
     function selectPolicy(key) {
+      const option = currentNode().options.find(item => item.key === key);
+      if (!option || !canAfford(option)) return;
       selectedPolicy = key;
       renderPolicyHand();
       renderAgentWall(getOption(selectedPolicy), "preview");
@@ -1433,23 +1609,11 @@
     }
 
     function applyChoice(option) {
+      state.costSpent += option.cost;
+      if (option.gagSeries) {
+        state.gagSeries = option.gagSeries;
+      }
       Object.entries(option.delta).forEach(([key, value]) => applyDelta(key, value));
-      if (state.green > 68 && state.mobility < 50) {
-        applyDelta("housing", 4);
-        applyDelta("media", 3);
-        applyDelta("trust", -2);
-      }
-      if (state.mobility > 68 && state.safety < 52) {
-        applyDelta("media", 4);
-        applyDelta("trust", -3);
-      }
-      if (state.housing > 65) {
-        applyDelta("media", 7);
-        applyDelta("trust", -4);
-      }
-      if (state.usage > 65 && state.trust > 58) {
-        applyDelta("budget", 2);
-      }
     }
 
     function makeFeedbackSummary(option) {
@@ -1470,6 +1634,21 @@
 
       const node = currentNode();
       const option = getOption(selectedPolicy);
+      if (!option || !canAfford(option)) {
+        logs.push(`第 ${turn} 節點｜${node.stage}｜cost 不足，未執行新政策。`);
+        document.getElementById("roundTitle").textContent = `${node.eventType}：未執行新政策`;
+        document.getElementById("roundText").textContent = `${node.text} 本輪 cost 不足，直接進入下一步。目前剩餘 cost：${remainingCost()}。`;
+        renderAgentWall(null, "committed");
+        turn += 1;
+        if (turn > maxTurns) {
+          setTimeout(showResult, 550);
+          return;
+        }
+        selectedPolicy = currentNode().options.find(nextOption => canAfford(nextOption))?.key || null;
+        renderAll();
+        renderCurrentEvent();
+        return;
+      }
       applyChoice(option);
       applyAgentReactions(option);
 
@@ -1479,10 +1658,10 @@
         const reaction = getReaction(agent, option);
         return `${agent.name}${reaction.emotion.label}${reaction.score >= 0 ? "+" : ""}${reaction.score}`;
       }).join("、");
-      logs.push(`第 ${turn} 節點｜${node.stage}｜選擇：${option.title}｜${summary}｜${reactionSummary}`);
+      logs.push(`第 ${turn} 節點｜${node.stage}｜選擇：${option.title}｜cost ${option.cost}｜${summary}｜${reactionSummary}`);
 
       document.getElementById("roundTitle").textContent = `${node.eventType}：${option.title}`;
-      document.getElementById("roundText").textContent = `${node.text} 本輪回饋：${summary}`;
+      document.getElementById("roundText").textContent = `${node.text} 本輪回饋：${summary} 目前剩餘 cost：${remainingCost()}。`;
       renderAgentWall(option, "committed");
 
       turn += 1;
@@ -1499,33 +1678,82 @@
     }
 
     function makeResult() {
-      if (state.usage > 68 && state.trust > 62 && state.housing < 62) {
+      if (state.gagSeries === "pool") {
         return {
-          title: "穩定日常型綠廊",
-          text: "你的事件樹選擇讓綠廊逐漸成為居民通勤、散步與社區活動的一部分。植栽、交通與居住壓力都有被納入治理節奏。"
+          title: "那年夏天，我們蓋了一個沒人下水的池子",
+          rarity: "0.42%",
+          text: "不知道是誰在會議室裡拍板，決定這片綠廊中間要挖一個大游泳池。附近居民起初還滿期待，結果開幕第一個月，維護人員光是處理水質跟漂浮物，就已經精疲力竭。秋天一到，沒人想下水，空蕩蕩的池子變成蚊子的繁殖地，居民開始懷念那個還只是普通公園的日子。這個結局沒有要批判什麼，純粹想說，有時候政策真的會走到一個讓人哭笑不得的地方，水池蓋了，水也滿了，只是沒人想到後面該怎麼辦。"
         };
       }
-      if (state.housing >= 68) {
+      if (state.gagSeries === "segway") {
         return {
-          title: "綠色仕紳化警戒",
-          text: "植栽與形象成功創造城市紅利，但房價與租金壓力被快速放大。政策成果開始被質疑是否排擠青年與租屋族。"
+          title: "滑出去容易，滑進日常很難",
+          rarity: "0.28%",
+          text: "交通局某次會議裡靈光一閃，決定主打電動平衡車作為這條綠廊的特色交通工具。結果現場變成一片狼藉，長輩看到呼嘯而過的平衡車紛紛卻步，學生們則苦惱著要去哪裡借車、去哪裡停車，原本想推廣的步行散步氣氛，反而因為這些滑來滑去的車子變得有點緊張。這條路看起來很科技很潮，實際上沒有想清楚使用情境，變成一個聽起來很酷、用起來很尷尬的政策。"
         };
       }
-      if (state.green > 72 && state.mobility < 58) {
+      if (state.gagSeries === "cyber") {
         return {
-          title: "景觀成功但轉型不足",
-          text: "植栽願景與設計很突出，但交通連續性不足，使綠廊比較像漂亮公園，而不是改變日常移動的基礎建設。"
+          title: "效果圖很美，現實很安靜",
+          rarity: "0.14%",
+          text: "招商計畫喊得震天響，效果圖畫得閃閃發光，玻璃帷幕大樓跟巨型商場矗立在綠廊旁，像極了某個未來城市的想像圖。可惜現實沒那麼配合，招商說明會辦了好幾場，願意進駐的廠商寥寥無幾，周邊居民也搞不清楚這個龐然大物跟他們的生活有什麼關係。這個結局想呈現的，是那種想要一步登天的規劃野心，跟在地真實需求之間的巨大落差，有時候越想往高大上的方向走，越容易走到一個沒人理解、也沒人想靠近的地方。"
         };
       }
-      if (state.safety < 52 || state.trust < 48) {
+
+      const scores = {
+        moveSafety: state.moveSafety,
+        maintenanceTrust: state.maintenanceTrust,
+        gentrificationPressure: state.gentrificationPressure
+      };
+      const topScore = Math.max(scores.moveSafety, scores.maintenanceTrust, scores.gentrificationPressure);
+      const winners = Object.entries(scores).filter(([, score]) => score === topScore).map(([key]) => key);
+
+      if (winners.length === 3) {
         return {
-          title: "設施完成但信任不足",
-          text: "部分設施推進了，但安全、維護或溝通沒有跟上。後期輿論容易把焦點轉向管理責任與政策承諾。"
+          title: "什麼都做了一點，卻沒人記得",
+          rarity: "1.13%",
+          text: "很難說這裡變好了，還是只是維持原狀。交通方便了一點，維護也做了一點，房價有點波動但不明顯，每一項都剛好做到夠用，沒有哪一塊特別突出。這種結局有時候是審慎的妥協，有時候卻只是猶豫不決的結果，城市規劃裡常常會出現這種面面俱到卻沒有靈魂的方案，不是因為沒有用心，而是因為太想討好每一個人，反而沒有人真正記住這裡發生過什麼改變。"
+        };
+      }
+      if (winners.includes("gentrificationPressure") && winners.includes("moveSafety")) {
+        return {
+          title: "方便，但有點貴",
+          rarity: "6.51%",
+          text: "這裡同時變得方便，也變得貴了一些。新開的選物店旁邊就是順暢的自行車道，年輕人騎車經過，順手停下來買杯咖啡，生活感跟便利感同時提升。但便利往往伴隨著代價，附近租金跟著水漲船高，原本騎車通勤的學生，現在可能要多想一下要不要在這裡的店家消費。這個結局像是一種平衡，卻不是真正的平衡，城市規劃常常會走到這個十字路口，把交通改善跟商業活絡綁在一起推動，結果是更多人能順暢地經過這裡，但能留在這裡生活的人，可能慢慢變成另一群人。"
+        };
+      }
+      if (winners.includes("gentrificationPressure") && winners.includes("maintenanceTrust")) {
+        return {
+          title: "照顧得太好的代價",
+          rarity: "1.41%",
+          text: "景觀維護得很用心，綠化也做得扎實，連帶讓這個區域的房價跟著上揚。對長輩來說，這是好事，他們看到的是一個被認真照顧的環境，視線清楚、不容易過敏，生活品質確實提升了。但這種被照顧好的代價，往往會反映在房價上，讓附近的租屋族開始感受到壓力。這個結局裡沒有明顯的輸家，卻也沒有人完全沒受到影響，維護得越好的地方，往往也是越容易被重新定價的地方。"
+        };
+      }
+      if (winners.includes("moveSafety") && winners.includes("maintenanceTrust")) {
+        return {
+          title: "平凡但安穩的日常",
+          rarity: "3.54%",
+          text: "這裡同時對學生跟長輩都友善了起來，自行車道順暢，夜間照明充足，長輩散步時也覺得安心，景觀維護得體，不會有視線死角的擔心。這個結局裡，房價沒有明顯波動，商業活動也沒有特別熱絡，城市看起來變得更好用，卻沒有變得更熱鬧或更貴。如果要說這是不是最理想的結局，其實很難講，因為它沒有特別的故事性，卻也因此讓人覺得，日子可以這樣安穩地過下去，好像也不錯。"
+        };
+      }
+      if (winners[0] === "moveSafety") {
+        return {
+          title: "安心夜歸路",
+          rarity: "23.76%",
+          text: "這條路走起來踏實了不少。原本汽機車呼嘯而過的路口，現在劃出了清楚的自行車道，晚上路燈也亮得讓人安心，不用再低著頭快步走過那段最暗的轉角。成大跟台南大學的學生開始把這裡當成日常通勤的一部分，十分鐘的步道銜接，讓原本需要繞路的人多了一個選項。傍晚時段，會看到不少人騎著 YouBike 慢慢經過，偶爾停下來看看風景，不趕時間。這裡沒有特別熱鬧，也沒有誰因此變得富有，只是有更多人能安心地從這裡走到那裡，這樣的改變很小，但對每天要經過這裡的人來說，其實很重要。"
+        };
+      }
+      if (winners[0] === "maintenanceTrust") {
+        return {
+          title: "被好好照顧的街角",
+          rarity: "5.37%",
+          text: "巷口的阿伯每天傍晚都會來這裡坐一下，他說現在的樹種得剛好，不會擋到看對面來車的視線，落葉也有人定期清，不會堆到發臭。排水溝去年颱風測試過，沒有積水，他特別提到這一點，說以前下大雨總是要繞路。這裡看起來沒有什麼戲劇性的變化，沒有新聞會特別報導，但對天天要經過這裡的長輩來說，有人在好好照顧這個地方這件事，本身就是一種安心。城市的進步，有時候不是蓋了什麼新的東西，而是讓本來就在這裡生活的人，可以繼續安穩地生活下去。"
         };
       }
       return {
-        title: "拉鋸治理型綠廊",
-        text: "你的事件樹產生部分成果，也留下交通、維護、房價與社區溝通的長期協商題。這是最接近真實政策現場的狀態。"
+        title: "越熱鬧，越想家",
+        rarity: "57.43%",
+        text: "這條綠廊完工後，周邊房價慢慢漲了起來，漲幅比台南其他行政區明顯一些。有些租屋的人開始覺得吃力，陸續搬到房價比較低的外圍。留下來的店家迎來了更多客人，街角多了幾間新開的咖啡廳跟選物店，周末的人潮也熱鬧了不少。只是熱鬧起來的同時，有些熟悉的面孔漸漸看不到了，巷口那間開了二十年的小吃店，租金到期後沒有續約。沒有人是故意的，只是當一個地方變得讓更多人想靠近，原本住在這裡的人，有時候也會被悄悄推著往外走。這不是誰的錯，只是城市發展裡，很容易被忽略的一種代價。"
       };
     }
 
@@ -1533,22 +1761,54 @@
       return agents.map(agent => `${agent.name}：${agentState[agent.key]}`).join("、");
     }
 
+    function getInternalScoreSummaryText() {
+      return [
+        `移動安全：${state.moveSafety}`,
+        `維護信任：${state.maintenanceTrust}`,
+        `仕紳化壓力：${state.gentrificationPressure}`,
+        `已使用 cost：${state.costSpent}/${totalCost}`,
+        `剩餘 cost：${remainingCost()}`
+      ].join("、");
+    }
+
+    function getRoundSummaryText() {
+      if (!logs.length) return "玩家沒有完成任何政策選擇。";
+      return logs.map((log, index) => `${index + 1}. ${log}`).join("\n");
+    }
+
     function buildDiscussionPrompt(result) {
       return [
-        "我剛玩了一個「台南鐵路綠廊道政策牌局」互動測驗，想請你和我一起分析這條政策路線。",
+        "我剛玩了一個「都市的聲音：台南鐵路綠廊道政策牌局」互動測驗，想請你和我一起分析這條政策路線。",
         "",
+        "【議題背景】",
+        "這個遊戲以台南鐵路地下化後的綠廊道治理想像為題。綠廊道可能同時牽涉公共空間、植栽維護、慢行交通、轉乘銜接、商圈活化、房價與租金壓力，以及不同年齡與居住型態居民的日常需求。",
+        "請保持中立分析：不要把任何單一選項預設為絕對正確或錯誤，也不要把 Agent 回應視為真實民調。這些回應是基於資料整理與角色設定的政策模擬，用來幫助討論不同取捨。",
+        "",
+        "【遊戲規則摘要】",
+        `玩家有總 cost ${totalCost}，共 6 個政策節點。每張牌會消耗 cost，並在內部累積三個隱藏軸：移動安全、維護信任、仕紳化壓力。`,
+        "移動安全大致對應短居學生對通勤、騎行、夜間安全的需求；維護信任大致對應高齡居民對照明、排水、樹種與可見維護的需求；仕紳化壓力大致對應在地青年居民面對商圈活力與居住排擠的矛盾。",
+        "如果玩家選到搞笑牌，會直接導向對應系列的荒謬結局；若沒有，則依三軸最高分、兩兩同分或三軸全平判定結局。",
+        "",
+        "【我的結果】",
         `我的測驗結果是：${result.title}`,
         `結果說明：${result.text}`,
-        `我的選擇路徑：${path.join(" → ")}`,
+        `我的選擇路徑：${path.length ? path.join(" → ") : "無"}`,
+        `內部判定摘要：${getInternalScoreSummaryText()}`,
         "",
-        `四種 Agent 最終期望度：${getAgentSummaryText()}`,
+        "【每回合摘要】",
+        getRoundSummaryText(),
         "",
+        "【四種 Agent 最終期望度】",
+        getAgentSummaryText(),
+        "",
+        "【我想討論的方向】",
         "請你從以下角度分析：",
-        "1. 這條政策路線最可能受到哪些族群支持？哪些族群會有疑慮？",
-        "2. 青年短居學生、青年在地居民、高齡在地居民、輿論報導會如何解讀這個結果？",
-        "3. 這條路線在交通、植栽、房價、維護或地方溝通上有哪些盲點？",
-        "4. 如果要讓這條綠廊道更公平、更日常、更可維護，下一步政策應該怎麼修正？",
-        "5. 請提出三個可以放進公聽會或簡報中的討論問題。"
+        "1. 請先重建我的政策路線：每一步選擇大概代表什麼治理想像？它們之間是否一致，或在哪些地方互相拉扯？",
+        "2. 這條路線最可能回應哪些族群的需求？哪些族群可能會覺得被忽略？請分別討論青年短居學生、青年在地居民、高齡在地居民與輿論報導。",
+        "3. 請分析三個隱藏軸的結果：移動安全、維護信任、仕紳化壓力各自如何被我的選擇推高或壓低？",
+        "4. 請指出這條路線在交通、植栽、維護、居住正義、商業活化或地方溝通上的盲點。",
+        "5. 如果要修正這條路線，請提出三個下一步政策調整，並說明各自可能犧牲或改善什麼。",
+        "6. 請提出三個適合放進公聽會、課堂討論或政策簡報的中立討論問題。"
       ].join("\n");
     }
 
@@ -1613,7 +1873,8 @@
       document.getElementById("gameScreen").classList.add("hidden");
       document.getElementById("resultScreen").classList.remove("hidden");
       document.getElementById("resultTitle").textContent = result.title;
-      document.getElementById("resultText").textContent = `${result.text} 你的路徑：${path.join(" → ")}。`;
+      document.getElementById("resultRarity").textContent = `結局稀有度 ${result.rarity}`;
+      document.getElementById("resultText").textContent = result.text;
       document.getElementById("discussionPrompt").value = buildDiscussionPrompt(result);
       document.getElementById("promptFeedback").textContent = "";
       document.getElementById("shareFeedback").textContent = "";
@@ -1624,7 +1885,6 @@
           <div class="bar"><i style="width:${agentState[agent.key]}%"></i></div>
         </div>
       `).join("");
-      document.getElementById("resultLog").innerHTML = logs.map(log => `<div class="log-item">${log}</div>`).join("");
     }
 
     function resetGame() {

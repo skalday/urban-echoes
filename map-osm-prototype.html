@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>台南鐵路綠廊道｜OSM 地圖試驗</title>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIINfQ0KjsD1RFydtE9n9UqHj1iMZyoGe1M="
+    crossorigin=""
+  />
+  <style>
+    :root {
+      --felt: #183f35;
+      --felt-2: #235547;
+      --paper: #fffdf7;
+      --tile: #fffaf0;
+      --ink: #17231d;
+      --muted: #66726c;
+      --line: #d8d0bf;
+      --green: #3d8b5a;
+      --blue: #2f6f9f;
+      --red: #b84c42;
+      --gold: #d3a13f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 20% 12%, rgba(255, 250, 240, 0.16), transparent 26%),
+        linear-gradient(135deg, var(--felt), #102820 68%);
+      color: var(--ink);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+    }
+
+    .prototype-shell {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+      gap: 12px;
+      padding: 16px;
+    }
+
+    .prototype-header {
+      max-width: 1680px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--tile);
+    }
+
+    .prototype-header h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: 0;
+      line-height: 1.25;
+    }
+
+    .prototype-header p {
+      margin: 6px 0 0;
+      color: rgba(255, 250, 240, 0.72);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .game-table-mock {
+      width: 100%;
+      max-width: 1680px;
+      height: calc(100vh - 98px);
+      min-height: 640px;
+      margin: 0 auto;
+      padding: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 14px;
+      border: 10px solid rgba(255, 250, 240, 0.16);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(255, 250, 240, 0.09), transparent),
+        var(--felt-2);
+      box-shadow: 0 20px 44px rgba(0, 0, 0, 0.28);
+    }
+
+    .left-zone-mock,
+    .right-zone-mock {
+      min-height: 0;
+      display: grid;
+      gap: 14px;
+    }
+
+    .left-zone-mock {
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .right-zone-mock {
+      grid-template-rows: minmax(0, 1fr) auto;
+    }
+
+    .map-zone {
+      position: relative;
+      overflow: hidden;
+      min-height: 0;
+      border: 2px solid rgba(255, 250, 240, 0.18);
+      border-radius: 12px;
+      background: #dfe8db;
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background: #dfe8db;
+    }
+
+    .leaflet-container,
+    .leaflet-pane,
+    .leaflet-tile,
+    .leaflet-marker-icon,
+    .leaflet-marker-shadow {
+      max-width: none;
+      max-height: none;
+    }
+
+    .leaflet-container {
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    .leaflet-pane,
+    .leaflet-tile,
+    .leaflet-marker-icon,
+    .leaflet-marker-shadow,
+    .leaflet-tile-container,
+    .leaflet-pane > svg,
+    .leaflet-pane > canvas,
+    .leaflet-zoom-box,
+    .leaflet-image-layer,
+    .leaflet-layer {
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+
+    .leaflet-tile {
+      width: 256px;
+      height: 256px;
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .leaflet-map-pane {
+      z-index: 100;
+    }
+
+    .leaflet-tile-pane {
+      z-index: 200;
+    }
+
+    .leaflet-overlay-pane {
+      z-index: 400;
+    }
+
+    .leaflet-shadow-pane {
+      z-index: 500;
+    }
+
+    .leaflet-marker-pane {
+      z-index: 600;
+    }
+
+    .leaflet-tooltip-pane {
+      z-index: 650;
+    }
+
+    .leaflet-popup-pane {
+      z-index: 700;
+    }
+
+    .leaflet-pane > svg,
+    .leaflet-pane > canvas {
+      pointer-events: none;
+    }
+
+    .leaflet-overlay-pane svg path {
+      pointer-events: auto;
+    }
+
+    .leaflet-control {
+      position: relative;
+      z-index: 800;
+      pointer-events: auto;
+    }
+
+    .leaflet-top,
+    .leaflet-bottom {
+      position: absolute;
+      z-index: 800;
+      pointer-events: none;
+    }
+
+    .leaflet-top {
+      top: 0;
+    }
+
+    .leaflet-bottom {
+      bottom: 0;
+    }
+
+    .leaflet-left {
+      left: 0;
+    }
+
+    .leaflet-right {
+      right: 0;
+    }
+
+    .leaflet-control-zoom,
+    .leaflet-control-layers,
+    .leaflet-control-attribution {
+      margin: 10px;
+      border-radius: 6px;
+      background: rgba(255, 253, 247, 0.92);
+      box-shadow: 0 4px 12px rgba(8, 23, 18, 0.18);
+    }
+
+    .leaflet-control-zoom {
+      overflow: hidden;
+      border: 1px solid rgba(216, 208, 191, 0.9);
+    }
+
+    .leaflet-control-zoom a {
+      display: block;
+      width: 30px;
+      height: 30px;
+      line-height: 28px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--ink);
+      background: rgba(255, 253, 247, 0.96);
+      border-bottom: 1px solid rgba(216, 208, 191, 0.9);
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .leaflet-control-zoom a:last-child {
+      border-bottom: 0;
+    }
+
+    .leaflet-control-zoom a:hover {
+      background: #fffaf0;
+    }
+
+    .leaflet-disabled {
+      cursor: default;
+      opacity: 0.45;
+    }
+
+    .leaflet-control-layers {
+      padding: 8px;
+      font-size: 12px;
+      color: var(--ink);
+    }
+
+    .leaflet-control-layers-toggle {
+      display: block;
+      width: 28px;
+      height: 28px;
+    }
+
+    .map-layer-tabs {
+      position: absolute;
+      z-index: 500;
+      left: 12px;
+      top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-width: calc(100% - 24px);
+      padding: 6px;
+      border: 1px solid rgba(216, 208, 191, 0.85);
+      border-radius: 10px;
+      background: rgba(255, 253, 247, 0.92);
+      box-shadow: 0 8px 18px rgba(8, 23, 18, 0.2);
+      backdrop-filter: blur(8px);
+    }
+
+    .map-layer-tabs button {
+      min-height: 30px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fffdf7;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .map-layer-tabs button.active {
+      border-color: var(--green);
+      background: var(--green);
+      color: #fff;
+      box-shadow: 0 6px 12px rgba(8, 23, 18, 0.18);
+    }
+
+    .map-legend {
+      position: absolute;
+      z-index: 500;
+      right: 12px;
+      bottom: 12px;
+      width: min(300px, calc(100% - 24px));
+      padding: 12px;
+      border: 1px solid rgba(216, 208, 191, 0.9);
+      border-radius: 10px;
+      background: rgba(255, 253, 247, 0.94);
+      box-shadow: 0 10px 18px rgba(8, 23, 18, 0.18);
+      backdrop-filter: blur(8px);
+    }
+
+    .map-legend strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--green);
+      font-size: 13px;
+    }
+
+    .map-legend p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .mock-panel {
+      min-height: 0;
+      padding: 14px;
+      border: 1px solid rgba(255, 250, 240, 0.18);
+      border-radius: 12px;
+      background: rgba(255, 253, 247, 0.92);
+      overflow: hidden;
+    }
+
+    .mock-panel h2 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      line-height: 1.35;
+    }
+
+    .mock-panel p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .mock-agent-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .mock-agent {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+
+    .leaflet-container {
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+    }
+
+    .leaflet-control-attribution {
+      font-size: 10px;
+    }
+
+    .signal-marker {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border: 3px solid #fffdf7;
+      border-radius: 999px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 8px 16px rgba(8, 23, 18, 0.28);
+    }
+
+    .signal-marker.plant {
+      background: var(--green);
+    }
+
+    .signal-marker.traffic {
+      background: var(--blue);
+    }
+
+    .signal-marker.housing {
+      background: var(--red);
+    }
+
+    .design-label {
+      width: 150px;
+      padding: 7px 9px;
+      border: 1px solid rgba(216, 208, 191, 0.95);
+      border-radius: 8px;
+      background: rgba(255, 253, 247, 0.95);
+      color: var(--ink);
+      box-shadow: 0 6px 14px rgba(8, 23, 18, 0.16);
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1.35;
+      text-align: center;
+    }
+
+    .design-label small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .boundary-label {
+      padding: 3px 6px;
+      border: 1px solid rgba(47, 111, 159, 0.35);
+      border-radius: 999px;
+      background: rgba(255, 253, 247, 0.9);
+      color: #2f5f86;
+      box-shadow: 0 4px 10px rgba(8, 23, 18, 0.12);
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .facility-marker {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border: 3px solid #fffdf7;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 900;
+      box-shadow: 0 8px 16px rgba(8, 23, 18, 0.26);
+    }
+
+    .facility-marker.fill {
+      background: #2f6f9f;
+    }
+
+    .facility-marker.remove {
+      background: #b84c42;
+    }
+
+    .facility-marker.elevated {
+      background: #d3a13f;
+    }
+
+    .facility-marker.planting {
+      background: #3d8b5a;
+    }
+
+    .signal-popup h3 {
+      margin: 0 0 6px;
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .signal-popup p {
+      margin: 4px 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .signal-popup b {
+      color: var(--ink);
+    }
+
+    @media (max-width: 1080px) {
+      .game-table-mock {
+        height: auto;
+        min-height: calc(100vh - 98px);
+        grid-template-columns: 1fr;
+      }
+
+      .map-zone {
+        min-height: 320px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="prototype-shell">
+    <header class="prototype-header">
+      <div>
+        <h1>OSM 地圖試驗：台南鐵路綠廊道</h1>
+        <p>獨立試驗頁。用 Leaflet 限制顯示範圍，測試 OSM 淡底圖與政策訊號圖層能否塞回主遊戲左上地圖區。</p>
+      </div>
+    </header>
+
+    <main class="game-table-mock">
+      <section class="left-zone-mock">
+        <div class="map-zone">
+          <div id="map"></div>
+          <div class="map-layer-tabs">
+            <button class="active" id="layer-plant" type="button" onclick="setMapLayer('plant')">植栽圖層</button>
+            <button id="layer-traffic" type="button" onclick="setMapLayer('traffic')">交通圖層</button>
+            <button id="layer-housing" type="button" onclick="setMapLayer('housing')">房價圖層</button>
+            <button id="layer-design" type="button" onclick="setMapLayer('design')">設計路段</button>
+            <button id="layer-all" type="button" onclick="setMapLayer('all')">全部訊號</button>
+          </div>
+          <div class="map-legend" id="mapLegend"></div>
+        </div>
+
+        <section class="mock-panel">
+          <h2>本局問題說明區</h2>
+          <p>這裡模擬主遊戲左下角空間，用來確認地圖高度與資訊密度是否適合一頁式牌桌版面。</p>
+        </section>
+      </section>
+
+      <section class="right-zone-mock">
+        <section class="mock-panel mock-agent-list">
+          <div class="mock-agent">
+            <h2>輿論報導</h2>
+            <p>地圖如果能直接顯示衝突點與政策訊號，報導語氣就能從抽象立場改成具體事件。</p>
+          </div>
+          <div class="mock-agent">
+            <h2>青年短居學生</h2>
+            <p>優先看自行車斷點、轉乘機會、夜間活動與租金風險。</p>
+          </div>
+          <div class="mock-agent">
+            <h2>青年在地居民</h2>
+            <p>優先看房價壓力、停車壓力、生活圈與在地店家。</p>
+          </div>
+          <div class="mock-agent">
+            <h2>高齡在地居民</h2>
+            <p>優先看遮蔭、座椅、照明、無障礙與日常路徑。</p>
+          </div>
+        </section>
+
+        <section class="mock-panel">
+          <h2>選擇牌區</h2>
+          <p>後續可以測試：不同事件回合自動切換預設圖層，例如植栽回合顯示植栽圖層，交通回合顯示交通圖層。</p>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+  <script>
+    const greenwayBounds = L.latLngBounds(
+      [22.957537, 120.188143],
+      [23.032044, 120.242559]
+    );
+
+    const map = L.map("map", {
+      zoomControl: false,
+      attributionControl: true,
+      maxBounds: greenwayBounds.pad(0.12),
+      maxBoundsViscosity: 0.95
+    });
+
+    map.fitBounds(greenwayBounds);
+    map.setMinZoom(13);
+    map.setMaxZoom(18);
+
+    L.control.zoom({ position: "bottomleft" }).addTo(map);
+
+    const baseMaps = {
+      "CARTO 淡色底圖": L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors &copy; CARTO"
+      }),
+      "OSM 標準底圖": L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: "&copy; OpenStreetMap contributors"
+      })
+    };
+
+    baseMaps["CARTO 淡色底圖"].addTo(map);
+    L.control.layers(baseMaps, null, {
+      position: "bottomright",
+      collapsed: true
+    }).addTo(map);
+
+    map.createPane("designPane");
+    map.getPane("designPane").style.zIndex = 450;
+    map.getPane("designPane").style.pointerEvents = "auto";
+
+    const corridorPath = [
+      [23.0045, 120.2122],
+      [22.9979, 120.2136],
+      [22.9918, 120.2157],
+      [22.9853, 120.2168],
+      [22.9765, 120.2183],
+      [22.9678, 120.2200]
+    ];
+
+    const corridorLayer = L.polyline(corridorPath, {
+      color: "#2f7f50",
+      weight: 9,
+      opacity: 0.78,
+      lineCap: "round",
+      lineJoin: "round"
+    }).addTo(map);
+
+    L.polyline(corridorPath, {
+      color: "#fffdf7",
+      weight: 3,
+      opacity: 0.82,
+      dashArray: "10 12",
+      lineCap: "round"
+    }).addTo(map);
+
+    const stationGap = L.circleMarker([22.9972, 120.2138], {
+      radius: 7,
+      color: "#fffdf7",
+      weight: 3,
+      fillColor: "#d3a13f",
+      fillOpacity: 1
+    }).addTo(map);
+
+    stationGap.bindTooltip("台南火車站段：非本案主要範圍", {
+      permanent: false,
+      direction: "top"
+    });
+
+    const mapLayers = {
+      plant: {
+        title: "植栽圖層",
+        note: "測試資料：用少量政策訊號標示遮蔭不足、補植機會、維護壓力與視線遮蔽。",
+        markerClass: "plant",
+        markers: [
+          {
+            code: "植",
+            title: "可補植喬木",
+            lat: 23.0064,
+            lng: 120.2117,
+            evidence: "北段接近校園與社區路徑，適合補強連續遮蔭。",
+            policyMeaning: "支持遮蔭優先，但需要同步規劃根系、鋪面與維護契約。",
+            affects: "高齡在地居民 +，青年在地居民 +，治理壓力 +"
+          },
+          {
+            code: "蔭",
+            title: "遮蔭不足",
+            lat: 22.9862,
+            lng: 120.2164,
+            evidence: "南段通勤路徑較長，步行舒適度受日照影響。",
+            policyMeaning: "若本局選擇步行優先，這裡是容易被看見的改善點。",
+            affects: "高齡在地居民 +，青年短居學生 +"
+          },
+          {
+            code: "修",
+            title: "維護壓力",
+            lat: 22.9746,
+            lng: 120.2189,
+            evidence: "綠帶與道路並行，落葉、修剪與照明維護會影響日常使用。",
+            policyMeaning: "密植綠廊需要搭配維護契約，不然容易轉成安全疑慮。",
+            affects: "輿論報導 +，高齡在地居民 -"
+          }
+        ]
+      },
+      traffic: {
+        title: "交通圖層",
+        note: "測試資料：標示自行車斷點、人車衝突、轉乘機會與家長接送 / 防災動線。",
+        markerClass: "traffic",
+        markers: [
+          {
+            code: "車",
+            title: "自行車斷點",
+            lat: 23.0018,
+            lng: 120.2128,
+            evidence: "北段靠近重要橫向道路，騎乘連續性容易被路口切斷。",
+            policyMeaning: "適合測試自行車優先或人車分流選項。",
+            affects: "青年短居學生 +，青年在地居民 +"
+          },
+          {
+            code: "轉",
+            title: "轉乘機會",
+            lat: 22.9954,
+            lng: 120.2144,
+            evidence: "火車站與通勤站周邊可作為綠廊交通節點。",
+            policyMeaning: "若選轉乘節點，地圖可以指出路廊和公共運輸的連接。",
+            affects: "青年短居學生 +，輿論報導 +"
+          },
+          {
+            code: "慢",
+            title: "交通寧靜區",
+            lat: 22.9817,
+            lng: 120.2171,
+            evidence: "設計簡報提到南段漸進式交通與雙向道路調整。",
+            policyMeaning: "適合放入減速街廓、步行優先與社區共存的選項脈絡。",
+            affects: "青年在地居民 +，高齡在地居民 +"
+          }
+        ]
+      },
+      housing: {
+        title: "房價圖層",
+        note: "測試資料：用風險點先代替熱區，標示房價壓力、租金風險、增值熱區與社宅串接。",
+        markerClass: "housing",
+        markers: [
+          {
+            code: "價",
+            title: "增值熱區",
+            lat: 23.0038,
+            lng: 120.2109,
+            evidence: "綠廊開發、校園與通勤節點會提高周邊可見度。",
+            policyMeaning: "商業活化可能提高討論度，但也會放大租金與居住排擠疑慮。",
+            affects: "輿論報導 +，青年短居學生 -，青年在地居民 -"
+          },
+          {
+            code: "租",
+            title: "租金風險",
+            lat: 22.9928,
+            lng: 120.2148,
+            evidence: "車站與生活機能附近可能先感受到租屋壓力。",
+            policyMeaning: "適合對應租金預警、房價監測與學生租屋焦慮。",
+            affects: "青年短居學生 -，青年在地居民 -"
+          },
+          {
+            code: "宅",
+            title: "社宅串接",
+            lat: 22.9785,
+            lng: 120.2182,
+            evidence: "若路廊改善能串起居住支持，商業化壓力會比較可控。",
+            policyMeaning: "適合測試社宅串接與社區共存路線。",
+            affects: "青年在地居民 +，高齡在地居民 +"
+          }
+        ]
+      }
+    };
+
+    const markerLayer = L.layerGroup().addTo(map);
+    const designSegmentLayer = L.layerGroup().addTo(map);
+    let activeMapLayer = "plant";
+
+    const designSegments = [
+      {
+        title: "北段北：線型公園 / 鄰里共園",
+        label: "柴頭港溪－實踐街",
+        theme: "藍綠帶延伸、古地景再造、可食地景、社區生活場域。",
+        source: "設計簡報第 47-49 頁",
+        color: "#3d8b5a",
+        center: [23.0260, 120.2070],
+        path: [
+          [23.0295, 120.2010],
+          [23.0240, 120.2040],
+          [23.0192, 120.2078]
+        ]
+      },
+      {
+        title: "北段北：實踐社區生活公園",
+        label: "實踐街－長榮路",
+        theme: "整合實踐公園與園道綠帶，處理社區生活與車行動線。",
+        source: "設計簡報第 50-51 頁",
+        color: "#4f9d69",
+        center: [23.0171, 120.2058],
+        path: [
+          [23.0192, 120.2078],
+          [23.0142, 120.2102]
+        ]
+      },
+      {
+        title: "北段北：三校共構勤學之道",
+        label: "長榮路－和緯路",
+        theme: "家長接送區、社區共享客廳、城市農場、共融遊具、通勤自行車道與校門出入口轉向。",
+        source: "設計簡報第 52-55 頁",
+        color: "#76a95d",
+        center: [23.0110, 120.2075],
+        path: [
+          [23.0142, 120.2102],
+          [23.0090, 120.2117],
+          [23.0057, 120.2125]
+        ]
+      },
+      {
+        title: "北段南：通學綠廊 + 社區道路",
+        label: "和緯路－小東路",
+        theme: "園道作為防災動線與通學路徑，配置水廊、LID、社區道路與遺構展示。",
+        source: "設計簡報第 59-63 頁",
+        color: "#2f8f8a",
+        center: [23.0010, 120.2093],
+        path: [
+          [23.0057, 120.2125],
+          [23.0012, 120.2134],
+          [22.9980, 120.2140]
+        ]
+      },
+      {
+        title: "車站段：樞紐綠環（非本工程範圍）",
+        label: "小東路－民族路",
+        theme: "配合臺南火車站工程願景，作為北段與南段的通學、車站與遺構連通樞紐。",
+        source: "設計簡報第 67-70 頁",
+        color: "#d3a13f",
+        dashArray: "10 10",
+        center: [22.9950, 120.2092],
+        path: [
+          [22.9980, 120.2140],
+          [22.9950, 120.2148],
+          [22.9915, 120.2156]
+        ]
+      },
+      {
+        title: "南段北：府城歷史人文散策",
+        label: "民族路－青年路－東門路",
+        theme: "全綠帶園道、彈性人本道路、歷史街區導覽、市民文化廣場、兒童遊樂與假日活動。",
+        source: "設計簡報第 72-83 頁",
+        color: "#6aa84f",
+        center: [22.9880, 120.2118],
+        path: [
+          [22.9915, 120.2156],
+          [22.9878, 120.2165],
+          [22.9837, 120.2173]
+        ]
+      },
+      {
+        title: "南段中：林蔭漫步廊帶",
+        label: "東門路－林森路",
+        theme: "西側全綠帶 + 交通寧靜區，包含 5.5m 雙向巷道、2m 人行道與 1.5m 連續綠帶。",
+        source: "設計簡報第 84-89 頁",
+        color: "#2f6f9f",
+        center: [22.9795, 120.2127],
+        path: [
+          [22.9837, 120.2173],
+          [22.9803, 120.2178],
+          [22.9768, 120.2184]
+        ]
+      },
+      {
+        title: "南段南：市民綠色大道",
+        label: "林森路－生產路－大同路",
+        theme: "西側全綠帶 + 7m 雙向道路，串接通勤自行車道、林森通勤站、南臺南通勤站、水廊與避難廣場。",
+        source: "設計簡報第 90-97 頁",
+        color: "#b84c42",
+        center: [22.9680, 120.2146],
+        path: [
+          [22.9768, 120.2184],
+          [22.9718, 120.2195],
+          [22.9660, 120.2207],
+          [22.9605, 120.2220]
+        ]
+      }
+    ];
+
+    const designBoundaries = [
+      { name: "實踐街", lat: 23.0192, lng: 120.2078, angle: -28 },
+      { name: "長榮路", lat: 23.0142, lng: 120.2102, angle: -26 },
+      { name: "和緯路", lat: 23.0057, lng: 120.2125, angle: -24 },
+      { name: "小東路", lat: 22.9980, lng: 120.2140, angle: -22 },
+      { name: "民族路", lat: 22.9915, lng: 120.2156, angle: -20 },
+      { name: "東門路", lat: 22.9837, lng: 120.2173, angle: -18 },
+      { name: "林森路", lat: 22.9768, lng: 120.2184, angle: -15 },
+      { name: "中華東路", lat: 22.9702, lng: 120.2198, angle: -14 },
+      { name: "生產路", lat: 22.9652, lng: 120.2212, angle: -12 }
+    ];
+
+    const designFacilities = [
+      {
+        type: "fill",
+        code: "填",
+        title: "長榮路地下道填平",
+        lat: 23.0142,
+        lng: 120.2102,
+        evidence: "第 140 頁：長榮路五段地下道，處理方式為填平地下道，未來穿越園道。",
+        policyMeaning: "由立體穿越轉為平面穿越，會改變車流、步行穿越與綠帶連續性。",
+        affects: "交通圖層 +，高齡在地居民安全感 +"
+      },
+      {
+        type: "remove",
+        code: "拆",
+        title: "開元國小人行陸橋拆除",
+        lat: 23.0060,
+        lng: 120.2125,
+        evidence: "第 140 頁：和緯路一段開元國小人行陸橋，拆除後新闢號誌化四叉路口。",
+        policyMeaning: "從垂直穿越改為平面號誌，需評估通學安全與家長接送。",
+        affects: "交通圖層 +，青年在地居民 +"
+      },
+      {
+        type: "remove",
+        code: "拆",
+        title: "開元陸橋拆除",
+        lat: 23.0025,
+        lng: 120.2132,
+        evidence: "第 140 頁：開元陸橋拆除，改設號誌化三叉路口。",
+        policyMeaning: "平面化後有利園道連續，但路口容量與慢行安全需同步設計。",
+        affects: "交通圖層 +，輿論報導 +"
+      },
+      {
+        type: "fill",
+        code: "填",
+        title: "小東路地下道填平",
+        lat: 22.9980,
+        lng: 120.2140,
+        evidence: "第 140 頁：小東路地下道填平，未來穿越園道，由工務局本案處理。",
+        policyMeaning: "車站段與北段銜接處的重要平面化節點。",
+        affects: "交通圖層 +，青年短居學生 +"
+      },
+      {
+        type: "elevated",
+        code: "橋",
+        title: "民族路壽陸橋抬高 / 人行自行車高架橋",
+        lat: 22.9915,
+        lng: 120.2156,
+        evidence: "第 11、73 頁：壽陸橋抬高，民族路順平；會議文字提到橫跨民族路人行與自行車高架橋。",
+        policyMeaning: "此處不是單純平面化，而是用立體連通維持人行與自行車連續。",
+        affects: "交通圖層 +，植栽遮蔭 +，輿論報導 +"
+      },
+      {
+        type: "remove",
+        code: "拆",
+        title: "東門路陸橋拆除",
+        lat: 22.9837,
+        lng: 120.2173,
+        evidence: "第 140 頁：東門路三段東門路陸橋拆除，改設號誌化四叉路口。",
+        policyMeaning: "東門圓環與歷史街區活動要同步處理過街、視線與自行車中繼。",
+        affects: "交通圖層 +，高齡在地居民 +"
+      },
+      {
+        type: "elevated",
+        code: "橋",
+        title: "東門路人行自行車高架橋構想",
+        lat: 22.9824,
+        lng: 120.2178,
+        evidence: "會議摘要：為連結東門圓環與東門路以南人行自行車，在東門路上方設置橫跨天橋。",
+        policyMeaning: "與東門路陸橋拆除不同，這是慢行系統的立體連通構想。",
+        affects: "交通圖層 +，青年短居學生 +"
+      },
+      {
+        type: "fill",
+        code: "填",
+        title: "林森路大同地下道填平",
+        lat: 22.9768,
+        lng: 120.2184,
+        evidence: "第 140 頁：林森路一段林森路大同地下道填平，改設號誌化四叉路口。",
+        policyMeaning: "南段中與南段南的分界，也是通勤站與綠帶銜接點。",
+        affects: "交通圖層 +，青年短居學生 +"
+      },
+      {
+        type: "elevated",
+        code: "橋",
+        title: "林森路人行自行車高架橋構想",
+        lat: 22.9755,
+        lng: 120.2190,
+        evidence: "會議摘要：為連結林森通勤站與林森路以南人行自行車，在林森路上方設置橫跨天橋。",
+        policyMeaning: "可支撐通勤、自行車與通學路線，但需注意視覺、維護與夜間安全。",
+        affects: "交通圖層 +，高齡在地居民 +"
+      },
+      {
+        type: "remove",
+        code: "拆",
+        title: "中華陸橋拆除",
+        lat: 22.9702,
+        lng: 120.2198,
+        evidence: "第 140-142 頁：中華東路三段中華陸橋拆除，改設號誌化四叉路口；簡報另列主橋拆除工序。",
+        policyMeaning: "大型立體設施拆除會釋放地面空間，也牽涉交通維持與施工干擾。",
+        affects: "交通圖層 +，輿論報導 +，青年在地居民 -"
+      }
+    ];
+
+    const plantingNotes = [
+      {
+        type: "planting",
+        code: "植",
+        title: "新住民家鄉植栽 / 可食地景",
+        lat: 23.0265,
+        lng: 120.2045,
+        evidence: "第 49 頁：北段北提到新住民家鄉植栽地景、可食地景、社區生活場域。",
+        policyMeaning: "植栽不是只做遮蔭，也可轉成社區認同與共管議題。",
+        affects: "植栽圖層 +，青年在地居民 +"
+      },
+      {
+        type: "planting",
+        code: "農",
+        title: "三校城市農場 / 水廊教育",
+        lat: 23.0108,
+        lng: 120.2120,
+        evidence: "第 52 頁：三校共構段提到城市農場花園、微氣候調適、水廊教育空間。",
+        policyMeaning: "可讓植栽選項與通學、教育、社區維護連動。",
+        affects: "植栽圖層 +，高齡在地居民 +，青年短居學生 +"
+      },
+      {
+        type: "planting",
+        code: "水",
+        title: "水廊 / LID / 遺構蘊水",
+        lat: 23.0000,
+        lng: 120.2138,
+        evidence: "第 61、63 頁：北段南配置水廊、LID 設施、雨水與伏流水資源。",
+        policyMeaning: "植栽與排水系統應一起呈現，避免只把綠帶視為景觀。",
+        affects: "植栽圖層 +，輿論報導 +"
+      },
+      {
+        type: "planting",
+        code: "蔭",
+        title: "立體綠廊 / 連續面狀遮蔭",
+        lat: 22.9845,
+        lng: 120.2166,
+        evidence: "第 36-37 頁：空中廊道下方連續面狀遮蔭可降低太陽輻射與體感溫度；6m 巷弄增加喬木植栽。",
+        policyMeaning: "此類資訊可支撐遮蔭優先、低矮通透或密植綠廊的政策取捨。",
+        affects: "植栽圖層 +，高齡在地居民 +"
+      },
+      {
+        type: "planting",
+        code: "療",
+        title: "園藝治療 / 林蔭漫步",
+        lat: 22.9792,
+        lng: 120.2180,
+        evidence: "第 88-89 頁：南段中提到戶外健身、園藝治療、古水文環教與地景遊戲。",
+        policyMeaning: "交通寧靜區可與高齡友善、健康活動、慢行舒適連動。",
+        affects: "植栽圖層 +，高齡在地居民 +"
+      }
+    ];
+
+    const designPoints = [
+      {
+        title: "東門圓環改善建議",
+        code: "東",
+        lat: 22.9837,
+        lng: 120.2173,
+        evidence: "工程預算未包含東門圓環交通改善，但簡報提出人行道拓寬、植栽退縮與視線保留建議。",
+        policyMeaning: "可作為步行安全、自行車中繼與路口改善的政策訊號。",
+        affects: "高齡在地居民 +，青年短居學生 +，輿論報導 +"
+      }
+    ];
+
+    function makeMarkerIcon(markerClass, code) {
+      return L.divIcon({
+        className: "",
+        html: `<div class="signal-marker ${markerClass}">${code}</div>`,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+        popupAnchor: [0, -16]
+      });
+    }
+
+    function makeFacilityIcon(type, code) {
+      return L.divIcon({
+        className: "",
+        html: `<div class="facility-marker ${type}">${code}</div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+        popupAnchor: [0, -16]
+      });
+    }
+
+    function makeDesignLabelIcon(segment) {
+      return L.divIcon({
+        className: "",
+        html: `<div class="design-label">${segment.title}<small>${segment.label}</small></div>`,
+        iconSize: [150, 50],
+        iconAnchor: [75, 25],
+        popupAnchor: [0, -22]
+      });
+    }
+
+    function makeBoundaryLabelIcon(name) {
+      return L.divIcon({
+        className: "",
+        html: `<div class="boundary-label">${name}</div>`,
+        iconSize: [76, 22],
+        iconAnchor: [38, 11]
+      });
+    }
+
+    function popupHtml(marker) {
+      return `
+        <div class="signal-popup">
+          <h3>${marker.title}</h3>
+          <p><b>資料依據：</b>${marker.evidence}</p>
+          <p><b>政策含意：</b>${marker.policyMeaning}</p>
+          <p><b>可能影響：</b>${marker.affects}</p>
+        </div>
+      `;
+    }
+
+    function segmentPopupHtml(segment) {
+      return `
+        <div class="signal-popup">
+          <h3>${segment.title}</h3>
+          <p><b>範圍：</b>${segment.label}</p>
+          <p><b>設計方案：</b>${segment.theme}</p>
+          <p><b>依據：</b>${segment.source}</p>
+        </div>
+      `;
+    }
+
+    function renderDesignSegments() {
+      designSegments.forEach((segment) => {
+        L.marker(segment.center, {
+          icon: makeDesignLabelIcon(segment),
+          pane: "markerPane"
+        })
+          .bindPopup(segmentPopupHtml(segment), {
+            maxWidth: 300
+          })
+          .addTo(designSegmentLayer);
+      });
+
+      designBoundaries.forEach((boundary) => {
+        const latSpan = 0.0032;
+        const lngSpan = 0.0050;
+        const line = [
+          [boundary.lat - latSpan, boundary.lng - lngSpan],
+          [boundary.lat + latSpan, boundary.lng + lngSpan]
+        ];
+
+        L.polyline(line, {
+          color: "#2f6f9f",
+          weight: 2,
+          opacity: 0.72,
+          dashArray: "6 8",
+          pane: "designPane"
+        }).addTo(designSegmentLayer);
+
+        L.marker([boundary.lat + 0.0024, boundary.lng + 0.0037], {
+          icon: makeBoundaryLabelIcon(boundary.name),
+          pane: "markerPane"
+        }).addTo(designSegmentLayer);
+      });
+
+      [...designFacilities, ...plantingNotes, ...designPoints].forEach((marker) => {
+        L.marker([marker.lat, marker.lng], {
+          icon: makeFacilityIcon(marker.type || "elevated", marker.code)
+        })
+          .bindPopup(popupHtml(marker), { maxWidth: 280 })
+          .bindTooltip(marker.title, {
+            direction: "top",
+            offset: [0, -12]
+          })
+          .addTo(designSegmentLayer);
+      });
+    }
+
+    function renderMapLayer() {
+      markerLayer.clearLayers();
+      designSegmentLayer.clearLayers();
+
+      if (activeMapLayer === "design") {
+        renderDesignSegments();
+      }
+
+      const layerKeys = activeMapLayer === "all" ? Object.keys(mapLayers) : activeMapLayer === "design" ? [] : [activeMapLayer];
+
+      layerKeys.forEach((key) => {
+        const layer = mapLayers[key];
+        layer.markers.forEach((marker) => {
+          L.marker([marker.lat, marker.lng], {
+            icon: makeMarkerIcon(layer.markerClass, marker.code)
+          })
+            .bindPopup(popupHtml(marker), { maxWidth: 280 })
+            .bindTooltip(marker.title, {
+              direction: "top",
+              offset: [0, -12]
+            })
+            .addTo(markerLayer);
+        });
+      });
+
+      const legend = document.getElementById("mapLegend");
+      if (activeMapLayer === "all") {
+        legend.innerHTML = `
+          <strong>全部政策訊號</strong>
+          <p>同時顯示植栽、交通與房價訊號，用來檢查資訊密度是否會壓過底圖。</p>
+        `;
+      } else if (activeMapLayer === "design") {
+        legend.innerHTML = `
+          <strong>設計路段</strong>
+          <p>依綠園道設計簡報框選北段、車站段與南段的主要設計方案。線位為政策示意，非正式工程邊界。</p>
+        `;
+      } else {
+        const layer = mapLayers[activeMapLayer];
+        legend.innerHTML = `
+          <strong>${layer.title}</strong>
+          <p>${layer.note}</p>
+        `;
+      }
+
+      ["plant", "traffic", "housing", "design", "all"].forEach((key) => {
+        document.getElementById(`layer-${key}`).classList.toggle("active", key === activeMapLayer);
+      });
+    }
+
+    function setMapLayer(layerKey) {
+      activeMapLayer = layerKey;
+      renderMapLayer();
+    }
+
+    function refreshMapLayout() {
+      map.invalidateSize({ animate: false });
+    }
+
+    const mapZone = document.querySelector(".map-zone");
+    const mapResizeObserver = new ResizeObserver(() => {
+      refreshMapLayout();
+    });
+
+    mapResizeObserver.observe(mapZone);
+
+    corridorLayer.bindTooltip("台南鐵路綠廊道示意主軸", {
+      sticky: true
+    });
+
+    renderMapLayer();
+    requestAnimationFrame(() => {
+      refreshMapLayout();
+      map.fitBounds(greenwayBounds, { animate: false });
+    });
+    window.addEventListener("load", () => {
+      refreshMapLayout();
+      map.fitBounds(greenwayBounds, { animate: false });
+    });
+    setTimeout(refreshMapLayout, 250);
+  </script>
+</body>
+</html>

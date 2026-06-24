@@ -1,0 +1,23 @@
+# Local/tooling
+.agents/
+.codex/
+.env
+.env.*
+*.log
+.DS_Store
+Thumbs.db
+
+# Private source data not intended for public GitHub
+_private_data/
+CLAUDE.md
+
+# Dependency/build artifacts, if added later
+node_modules/
+dist/
+build/
+.vercel/
+
+# Audio assets: commit only after license is cleared
+sounds/*.mp3
+sounds/*.wav
+sounds/*.m4a
