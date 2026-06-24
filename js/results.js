@@ -140,3 +140,16 @@ const endingEchoes = {
     elder: "大樓這麼亮，晚上散步不用怕暗，抬頭還像在看科幻電影。"
   }
 };
+
+const endingSoundtracks = {
+  "安心夜歸路": "assets/01.mp3",
+  "被好好照顧的街角": "assets/02.mp3",
+  "越熱鬧，越想家": "assets/03.mp3",
+  "方便，但有點貴": "assets/04.mp3",
+  "照顧得太好的代價": "assets/05.mp3",
+  "平凡但安穩的日常": "assets/06.mp3",
+  "什麼都做了一點，卻沒人記得": "assets/07.mp3",
+  "那年夏天，我們蓋了一個沒人下水的池子": "assets/08.mp3",
+  "滑出去容易，滑進日常很難": "assets/09.mp3",
+  "效果圖很美，現實很安靜": "assets/10.mp3"
+};

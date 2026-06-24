@@ -86,8 +86,19 @@
       <h2 id="resultTitle">測驗結果</h2>
       <span class="result-rarity" id="resultRarity">結局稀有度 0%</span>
       <p id="resultText"></p>
-      <h3>都市的聲音</h3>
-      <div class="result-grid" id="resultAgents"></div>
+      <section class="urban-voices">
+        <h3>都市的聲音</h3>
+        <div class="voice-row">
+          <div class="sound-play-panel">
+            <button class="sound-play-btn" id="resultAudioToggle" type="button" onclick="toggleResultAudio()" aria-label="播放結果聲景">
+              <span class="play-icon" aria-hidden="true"></span>
+            </button>
+            <strong id="resultSoundText">播放聲音</strong>
+            <audio id="resultAudio" preload="metadata"></audio>
+          </div>
+          <div class="result-grid" id="resultAgents"></div>
+        </div>
+      </section>
       <div class="result-tools">
         <section class="prompt-box">
           <h3>AI 討論 Prompt</h3>

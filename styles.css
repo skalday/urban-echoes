@@ -679,13 +679,17 @@
     .result {
       display: grid;
       place-items: center;
-      padding: 18px;
+      min-height: 100vh;
+      padding: 16px;
       background: #f2eadc;
     }
 
     .result-card {
-      width: min(1040px, 100%);
-      padding: 18px;
+      width: min(1360px, 100%);
+      display: grid;
+      grid-template-rows: auto auto auto auto auto minmax(0, 1fr);
+      gap: 10px;
+      padding: clamp(14px, 2vw, 22px) clamp(16px, 2.4vw, 24px);
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: var(--paper);
@@ -694,13 +698,19 @@
 
     .result-card h2 {
       margin: 4px 0 6px;
-      font-size: clamp(24px, 4vw, 42px);
+      font-size: clamp(28px, 3.7vw, 54px);
       line-height: 1.1;
     }
 
     .result-card p {
       color: var(--muted);
       line-height: 1.55;
+    }
+
+    #resultText {
+      margin: 0;
+      font-size: clamp(14px, 1.35vw, 17px);
+      line-height: 1.5;
     }
 
     .result-rarity {
@@ -711,18 +721,96 @@
       font-weight: 950;
     }
 
+    .urban-voices {
+      display: grid;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .urban-voices h3 {
+      margin: 0;
+      font-size: 23px;
+    }
+
+    .voice-row {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: 14px;
+      align-items: stretch;
+      min-height: 0;
+    }
+
+    .sound-play-panel {
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 10px;
+      min-height: 120px;
+      border-bottom: 1px solid rgba(216, 208, 191, 0.55);
+    }
+
+    .sound-play-panel strong {
+      font-size: clamp(18px, 1.8vw, 23px);
+      line-height: 1.2;
+      text-align: center;
+    }
+
+    .sound-play-btn {
+      position: relative;
+      width: clamp(62px, 6vw, 78px);
+      height: clamp(62px, 6vw, 78px);
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 12px 22px rgba(61, 139, 90, 0.26);
+    }
+
+    .sound-play-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .sound-play-btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+      transform: none;
+    }
+
+    .play-icon {
+      position: absolute;
+      left: 40%;
+      top: 30%;
+      width: 0;
+      height: 0;
+      border-top: 0.85em solid transparent;
+      border-bottom: 0.85em solid transparent;
+      border-left: 1.35em solid #fff;
+      font-size: clamp(13px, 1.2vw, 16px);
+    }
+
+    .sound-play-btn.playing .play-icon {
+      left: 32%;
+      top: 30%;
+      width: 34%;
+      height: 40%;
+      border: 0;
+      border-left: 0.48em solid #fff;
+      border-right: 0.48em solid #fff;
+    }
+
     .result-grid {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 10px;
-      margin: 10px 0;
+      margin: 0;
+      min-height: 0;
     }
 
     .result-stat {
       border: 1px solid var(--line);
       border-radius: var(--radius);
       background: #fff;
-      padding: 9px;
+      padding: 12px;
+      min-width: 0;
+      overflow: hidden;
     }
 
     .result-stat strong {
@@ -736,13 +824,18 @@
       color: #4f5b54;
       font-size: 12px;
       line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .result-tools {
       display: grid;
       grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
       gap: 14px;
-      margin: 10px 0 0;
+      min-height: 0;
+      margin: 0;
     }
 
     .prompt-box,
@@ -751,6 +844,7 @@
       border-radius: var(--radius);
       background: #fff;
       padding: 10px;
+      min-height: 0;
     }
 
     .prompt-box h3,
@@ -766,8 +860,8 @@
 
     .prompt-textarea {
       width: 100%;
-      height: 160px;
-      min-height: 130px;
+      height: clamp(96px, 18vh, 148px);
+      min-height: 84px;
       resize: vertical;
       border: 1px solid var(--line);
       border-radius: var(--radius);
@@ -821,8 +915,20 @@
     @media (max-width: 1080px) {
       .game-table,
       .intro-card,
+      .voice-row,
       .result-tools {
         grid-template-columns: 1fr;
+      }
+
+      .result {
+        height: auto;
+        min-height: 100vh;
+        overflow: visible;
+      }
+
+      .result-card {
+        height: auto;
+        overflow: visible;
       }
 
       .game-table {

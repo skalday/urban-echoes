@@ -311,6 +311,25 @@ const maxTurns = eventFlow.length;
       document.getElementById("shareFeedback").textContent = "已開啟分享視窗。";
     }
 
+    function updateResultAudioButton(isPlaying = false) {
+      const button = document.getElementById("resultAudioToggle");
+      button.classList.toggle("playing", isPlaying);
+      button.setAttribute("aria-label", isPlaying ? "暫停結果聲景" : "播放結果聲景");
+    }
+
+    function toggleResultAudio() {
+      const audio = document.getElementById("resultAudio");
+      if (!audio.src) return;
+      if (audio.paused) {
+        audio.play()
+          .then(() => updateResultAudioButton(true))
+          .catch(() => updateResultAudioButton(false));
+      } else {
+        audio.pause();
+        updateResultAudioButton(false);
+      }
+    }
+
     function showResult() {
       const result = makeResult();
       window.latestShareText = buildShareText(result);
@@ -319,6 +338,24 @@ const maxTurns = eventFlow.length;
       document.getElementById("resultTitle").textContent = result.title;
       document.getElementById("resultRarity").textContent = `結局稀有度 ${result.rarity}`;
       document.getElementById("resultText").textContent = result.text;
+      const audio = document.getElementById("resultAudio");
+      const soundtrack = endingSoundtracks[result.title];
+      audio.pause();
+      audio.currentTime = 0;
+      if (soundtrack) {
+        audio.src = soundtrack;
+      } else {
+        audio.removeAttribute("src");
+      }
+      audio.load();
+      document.getElementById("resultAudioToggle").disabled = !soundtrack;
+      updateResultAudioButton(false);
+      audio.onended = () => updateResultAudioButton(false);
+      audio.onpause = () => updateResultAudioButton(false);
+      audio.onplay = () => updateResultAudioButton(true);
+      document.getElementById("resultSoundText").textContent = soundtrack
+        ? "播放聲音"
+        : "這個結局尚未設定聲景。";
       document.getElementById("discussionPrompt").value = buildDiscussionPrompt(result);
       document.getElementById("promptFeedback").textContent = "";
       document.getElementById("shareFeedback").textContent = "";
@@ -339,6 +376,12 @@ const maxTurns = eventFlow.length;
       path.length = 0;
       Object.assign(state, initialState);
       Object.assign(agentState, initialAgentState);
+      const audio = document.getElementById("resultAudio");
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
+      document.getElementById("resultAudioToggle").disabled = false;
+      updateResultAudioButton(false);
       document.getElementById("resultScreen").classList.add("hidden");
       document.getElementById("introScreen").classList.remove("hidden");
       document.getElementById("gameScreen").classList.add("hidden");
