@@ -13,21 +13,22 @@
         <div class="logo-mark" aria-label="都市的聲音標準字">
           <span class="logo-tile">都</span>
           <span class="logo-tile">市</span>
+          <span class="logo-tile">的</span>
           <span class="logo-tile">聲</span>
           <span class="logo-tile">音</span>
         </div>
-        <div class="brand-kicker">TAINAN GREENWAY POLICY MAHJONG</div>
-        <h1>都市的聲音</h1>
+        <div class="brand-kicker">URBAN ECHOES:TAINAN GREENWAY POLICY GAME</div>
+        <h1 class="sr-only">都市的聲音</h1>
         <p class="intro-copy">
-          這是一場台南鐵路綠廊道的政策牌局。你不是要預測真實民意，而是透過一回合一回合的政策出牌，觀察綠地、交通、房價、安全與輿論如何互相牽動，最後形成不同的治理結果。
+          這是一場台南鐵路綠廊道的政策牌局，而你就是其中一位玩家。<br>透過一回合一回合的政策出牌，觀察都市環境與居民輿論如何互相牽動。
         </p>
       </div>
       <div class="intro-rules">
         <strong>基本玩法</strong>
-        <p>畫面左側是綠廊地圖與本局說明，右側是 Agent 即時互動牆與本輪選擇肢。</p>
-        <p>先選都市願景，再依序處理植栽、交通與房價事件；每次選擇都會觸發四種角色的情緒反應。</p>
-        <p>每一輪的卡牌都會重新更新。完成所有節點後，會出現測驗結果、政策後果與角色態度摘要。</p>
-        <button class="start-btn" onclick="startGame()">進入政策牌局</button>
+        <p>畫面上半部是綠廊道地圖與居民意見，下半部是回合說明與事件卡。</p>
+        <p>遊戲一共有6輪，每一輪都會更新卡牌。</p>
+        <p>完成所有選擇後，會出現對應的都市聲音測驗結果。</p>
+        <button class="start-btn" onclick="startGame()">進入遊戲</button>
       </div>
     </div>
   </section>
@@ -51,7 +52,7 @@
           <div class="node n4"><span>崇賢公園</span></div>
         </main>
         <div class="round-message">
-          <h2 id="roundTitle">第一局：綠廊尚未被解讀</h2>
+          <h2 id="roundTitle">【第一局】<br>綠廊尚未被解讀</h2>
           <p id="roundText">請從下方選擇本輪選項，再按「確認選擇」推進事件樹。</p>
         </div>
       </section>
@@ -59,7 +60,7 @@
       <section class="right-zone">
         <aside class="agent-panel">
           <div class="panel-head">
-            <h2>Agent 即時互動牆</h2>
+            <h2>都市的聲音</h2>
             <span class="tag" id="agentPhase">尚未出牌</span>
           </div>
           <div class="agent-wall" id="agentWall"></div>
@@ -67,7 +68,7 @@
 
         <div class="hand-panel">
           <div class="panel-head">
-            <h2>本輪選擇肢</h2>
+            <h2>本輪事件</h2>
             <span class="tag" id="selectedTag">目前選擇：景觀公園型</span>
           </div>
           <div class="tile-hand" id="policyHand"></div>
@@ -102,18 +103,18 @@
       <div class="result-tools">
         <section class="prompt-box">
           <h3>AI 討論 Prompt</h3>
-          <p>複製這段文字到你習慣使用的 AI 工具，延伸討論你的政策路線、盲點與可能修正方案。</p>
+          <p>複製這段文字到你習慣使用的 AI 工具，延伸討論你的測驗結果。</p>
           <textarea class="prompt-textarea" id="discussionPrompt" readonly></textarea>
           <button class="copy-btn" onclick="copyDiscussionPrompt()">複製 Prompt</button>
           <div class="tool-feedback" id="promptFeedback"></div>
         </section>
         <section class="share-box">
           <h3>社群分享</h3>
-          <p>分享你的初步測驗結果，邀請其他人比較不同政策路線。Instagram 會複製文案供你貼上。</p>
+          <p>分享你的測驗結果，邀請其他人比較不同政策路線。</p>
           <div class="share-actions">
             <button class="share-btn" onclick="shareResult('facebook')">Facebook</button>
             <button class="share-btn" onclick="shareResult('threads')">Threads</button>
-            <button class="share-btn" onclick="shareResult('x')">X</button>
+            <button class="share-btn" onclick="shareResult('x')">X (Twitter)</button>
             <button class="share-btn" onclick="shareResult('instagram')">Instagram</button>
           </div>
           <div class="tool-feedback" id="shareFeedback"></div>

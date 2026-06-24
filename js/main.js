@@ -107,6 +107,10 @@ const maxTurns = eventFlow.length;
       return { label: "觀望", mark: "→", tone: "neutral" };
     }
 
+    function formatRoundTitle(title) {
+      return title.replace(/^(第[^：:]+局)[：:]\s*/, "【$1】<br>");
+    }
+
     function getReaction(agent, option) {
       const score = getAgentScore(agent, option);
       const emotion = getEmotion(score);
@@ -171,7 +175,7 @@ const maxTurns = eventFlow.length;
 
     function renderCurrentEvent() {
       const node = currentNode();
-      document.getElementById("roundTitle").textContent = node.title;
+      document.getElementById("roundTitle").innerHTML = formatRoundTitle(node.title);
       document.getElementById("roundText").textContent = node.text;
       renderAgentWall(getOption(selectedPolicy), "preview");
     }
@@ -242,16 +246,16 @@ const maxTurns = eventFlow.length;
       }).join("、");
       logs.push(`第 ${turn} 節點｜${node.stage}｜選擇：${option.title}｜cost ${option.cost}｜${summary}｜${reactionSummary}`);
 
+      if (turn >= maxTurns) {
+        showResult();
+        return;
+      }
+
       document.getElementById("roundTitle").textContent = `${node.eventType}：${option.title}`;
       document.getElementById("roundText").textContent = `${node.text} 本輪回饋：${summary} 目前剩餘 cost：${remainingCost()}。`;
       renderAgentWall(option, "committed");
 
       turn += 1;
-
-      if (turn > maxTurns) {
-        setTimeout(showResult, 550);
-        return;
-      }
 
       selectedPolicy = currentNode().options[0].key;
       renderAll();
@@ -385,7 +389,7 @@ const maxTurns = eventFlow.length;
       document.getElementById("resultScreen").classList.add("hidden");
       document.getElementById("introScreen").classList.remove("hidden");
       document.getElementById("gameScreen").classList.add("hidden");
-      document.getElementById("roundTitle").textContent = "第一局：綠廊尚未被解讀";
+      document.getElementById("roundTitle").innerHTML = formatRoundTitle("第一局：綠廊尚未被解讀");
       document.getElementById("roundText").textContent = "請從下方選擇本輪選項，再按「確認選擇」推進事件樹。";
       renderAll();
     }
