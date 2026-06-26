@@ -125,6 +125,58 @@
 
   const elevatedZoneIndices = [3, 4, 5];
 
+  // ── 公園多邊形 ────────────────────────────────────────────────────────
+  // 座標原始格式 lng,lat → 轉為 Leaflet [lat, lng]
+  const parkPolygons = [
+    {
+      name: "永祥里公園", emojiCount: 3,
+      coords: [
+        [23.015392,120.219924],[23.015392,120.220396],[23.015059,120.220364],
+        [23.015019,120.220235],[23.014906,120.220193],[23.014916,120.220101],
+        [23.014257,120.220112],[23.013983,120.219889],[23.013625,120.219833],
+        [23.013533,120.219978],[23.013168,120.219710],[23.013173,120.219460],
+        [23.013314,120.219436],[23.013375,120.219584],[23.013546,120.219602],
+        [23.013602,120.219444],[23.014262,120.219675],[23.014521,120.219643],
+        [23.014945,120.219501],[23.015318,120.219707]
+      ]
+    },
+    {
+      name: "實踐公園", emojiCount: 1,
+      coords: [
+        [23.013314,120.219440],[23.013366,120.219607],[23.013493,120.219706],
+        [23.013352,120.219868],[23.013154,120.219717],[23.013186,120.219461]
+      ]
+    },
+    {
+      name: "香草運動公園", emojiCount: 2,
+      coords: [
+        [23.006549,120.215648],[23.006749,120.216281],
+        [23.006159,120.216487],[23.005971,120.215889]
+      ]
+    },
+    {
+      name: "台南公園", emojiCount: 5,
+      coords: [
+        [23.004424,120.210875],[23.003900,120.213418],
+        [23.000110,120.212662],[23.001191,120.208966]
+      ]
+    },
+    {
+      name: "公60公園", emojiCount: 1,
+      coords: [
+        [22.962363,120.216954],[22.962360,120.217220],
+        [22.960535,120.217410],[22.960530,120.217134]
+      ]
+    },
+    {
+      name: "崇賢公園", emojiCount: 1,
+      coords: [
+        [22.960932,120.217656],[22.960957,120.219885],
+        [22.960653,120.219952],[22.960539,120.217712]
+      ]
+    }
+  ];
+
   // ── cardScenes ────────────────────────────────────────────────────────
   const cardScenes = {
     "vision-rest": {
@@ -158,119 +210,119 @@
     },
     "landscape-plaza": {
       round: "2 景觀願景", title: "空曠廣場",
-      corridor: "green", treeMode: "none",
+      corridor: "green", treeMode: "none", showParks: "green-empty",
       impactEmojis: ["⬜", "🧱", "☀️"], impactCount: 10, impactAnimation: "pulse",
-      dataLegend: "廊道線段；刻意不顯示行道樹，呈現空曠硬鋪面狀態。",
+      dataLegend: "廊道線段 + 6 座公園多邊形（綠色）；刻意不顯示行道樹，呈現空曠硬鋪面狀態。",
       impactLegend: "行道樹消失，廣場硬鋪面增加，曝曬感上升。"
     },
     "landscape-trees": {
       round: "2 景觀願景", title: "很多高大的樹",
       tint: "green", corridor: "green", treeMode: "dense",
-      corridorPlant: "trees", sightlineWarnings: [1, 4],
+      corridorPlant: "trees", sightlineWarnings: [1, 4], showParks: "green-trees",
       impactEmojis: ["🌳", "🌲", "🌳"], impactCount: 14, impactAnimation: "float",
-      dataLegend: "真實行道樹點位（tree_data.js）+ 廊道上隨機補植樹木符號；東豐路口（index 1）與東門路口（index 4）加視線受阻警示。",
+      dataLegend: "真實行道樹點位 + 廊道補植樹木符號 + 公園綠色面積（內有🌳）；東豐、東門路口加視線警示。",
       impactLegend: "密植樹冠強化遮蔭感；路口視線警示呼應高齡居民真實抱怨。"
     },
     "landscape-flowers": {
       round: "2 景觀願景", title: "低矮草和花",
-      corridor: "green", treeMode: "sparse", corridorPlant: "flowers",
+      corridor: "green", treeMode: "sparse", corridorPlant: "flowers", showParks: "green-flowers",
       impactEmojis: ["🌼", "🌷", "🌱"], impactCount: 12, impactAnimation: "pop",
-      dataLegend: "稀疏行道樹點位 + 花草符號沿廊道分布，加「需持續維護 →」提示標籤。",
+      dataLegend: "稀疏行道樹 + 花草符號沿廊道分布 + 公園綠色面積（內有🌼🌷）；加「需持續維護」提示。",
       impactLegend: "植栽密度下降，花草填補空間，但維護標籤暗示後續成本。"
     },
     "landscape-pool": {
       round: "2 景觀願景", title: "大游泳池 L2",
-      tint: "blue", corridor: "blue", corridorWeight: 30,
+      tint: "blue", corridor: "blue", corridorWeight: 30, showParks: "blue-pool",
       impactEmojis: ["🏊", "🌊", "🤿", "🛟"], impactCount: 26, impactAnimation: "float", impactLarge: true,
-      dataLegend: "廊道線段繼續加粗（weight 30），水道擴張感超越 L1。",
-      impactLegend: "水池範圍再次擴大，廊道藍色更寬，荒謬方案持續壓過綠廊。"
+      dataLegend: "廊道加粗藍色線段 + 公園面積轉為藍色水域（內有🏊🌊🛟）。",
+      impactLegend: "水池範圍再次擴大，廊道與公園全部藍化，荒謬感進一步放大。"
     },
     "maintenance-plaza": {
       round: "3 景觀維護", title: "廣場維護",
-      corridor: "green", treeMode: "none",
+      corridor: "green", treeMode: "none", showParks: "green-empty",
       impactEmojis: ["🧹", "⬜", "🧽"], impactCount: 10, impactAnimation: "pulse",
-      dataLegend: "使用綠廊線段；本牌不顯示行道樹 KML 點位，代表維護對象偏硬鋪面。",
+      dataLegend: "廊道線段 + 6 座公園綠色面積（無植栽）；本牌不顯示行道樹，代表維護對象偏硬鋪面。",
       impactLegend: "清潔與空地符號表現低複雜度維護，也暗示空間可能變單調。"
     },
     "maintenance-flat": {
       round: "3 景觀維護", title: "扁平單一植栽",
-      corridor: "green", treeMode: "regular",
+      corridor: "green", treeMode: "regular", showParks: "green-flat",
       impactEmojis: ["🌱", "🌱", "📋"], impactCount: 16, impactAnimation: "pulse",
-      dataLegend: "以 tree_data.js 抽樣真實樹點，採較規律取樣呈現標準化管理感。",
+      dataLegend: "規律取樣行道樹點位 + 公園綠色面積（內有🌱）；呈現標準化管理感。",
       impactLegend: "重複植栽與排程符號誇張化單一、好管、但缺乏多樣性的維護路線。"
     },
     "maintenance-eco": {
       round: "3 景觀維護", title: "自然生態圈",
-      tint: "green", corridor: "green", treeMode: "dense", corridorPlant: "trees",
+      tint: "green", corridor: "green", treeMode: "dense", corridorPlant: "trees", showParks: "green-eco",
       impactEmojis: ["🌿", "🪲", "🦋", "🌼"], impactCount: 18, impactAnimation: "float",
-      dataLegend: "抽樣顯示 tree_data.js 的真實行道樹點位。",
+      dataLegend: "真實行道樹點位 + 公園綠色面積（內有🌿🦋🌼）；生態維護邊界模糊。",
       impactLegend: "浮動昆蟲與雜生植物符號表現生態豐富，也暗示維護邊界變模糊。"
     },
     "maintenance-pool": {
       round: "3 景觀維護", title: "大游泳池維護 L3",
-      tint: "blue", corridor: "blue", corridorWeight: 30,
+      tint: "blue", corridor: "blue", corridorWeight: 30, showParks: "blue-pool",
       impactEmojis: ["🚧", "🧹", "💸", "🛟"], impactCount: 24, impactAnimation: "shake", impactLarge: true,
-      dataLegend: "廊道藍色寬線延續 L2（weight 30），但符號全換成維護場景。",
+      dataLegend: "廊道藍色寬線延續 L2 + 公園面積轉為藍色水域（內有🛟💸）；維護場景失控。",
       impactLegend: "龐大水池後續維護失控；抖動的維修與費用符號誇張化維護壓力。"
     },
     "traffic-car": {
       round: "4 交通政策", title: "汽機車",
-      corridor: "car", showIntersections: "r4-car", showBridges: false,
+      corridor: "car", showIntersections: "r4-car", showBridges: false, showYoubike: true,
       impactEmojis: ["🚗", "🛵", "💨"], impactCount: 12, impactAnimation: "shake",
-      dataLegend: "9 個路口顯示汽機車平面穿越；高架橋不建，廊道連續性最差。",
+      dataLegend: "9 個路口顯示汽機車平面穿越；21 個 YouBike 站點（🚲）；高架橋不建。",
       impactLegend: "廊道灰暗、路口允許車輛平面通過，凸顯綠廊被切斷。"
     },
     "traffic-bike": {
       round: "4 交通政策", title: "自行車步行優先",
-      tint: "green", corridor: "connected", showIntersections: "r4-bike", showBridges: true,
+      tint: "green", corridor: "connected", showIntersections: "r4-bike", showBridges: true, showYoubike: true,
       impactEmojis: ["🚲", "🚶", "✨"], impactCount: 14, impactAnimation: "float",
-      dataLegend: "9 個路口全部轉為禁止汽機車（🚲🚶）；2 座高架橋保留。",
+      dataLegend: "9 個路口全部轉為禁止汽機車；21 個 YouBike 站點（🚲）；2 座高架橋保留。",
       impactLegend: "廊道全線連貫，所有路口禁止汽機車，展現最高優先的慢行政策。"
     },
     "traffic-mixed": {
       round: "4 交通政策", title: "混合",
-      corridor: "mixed", showIntersections: "r4-mixed", showBridges: true,
+      corridor: "mixed", showIntersections: "r4-mixed", showBridges: true, showYoubike: true,
       impactEmojis: ["🚗", "🚲", "↔️"], impactCount: 10, impactAnimation: "pulse",
-      dataLegend: "立體綠廊範圍內路口（青年、東門、府連）高架化；其餘 6 個路口維持汽機車平面穿越；2 座高架橋。",
+      dataLegend: "立體綠廊範圍內路口高架化；其餘 6 個路口維持車道；21 個 YouBike 站點（🚲）；2 座高架橋。",
       impactLegend: "部分高架保護、部分維持車道穿越，折衷帶來複雜性。"
     },
     "traffic-scooter": {
       round: "4 交通政策", title: "電動平衡車 L4",
-      corridor: "scooter", showIntersections: "r4-scooter",
+      corridor: "scooter", showIntersections: "r4-scooter", showYoubike: true,
       impactEmojis: ["🛴", "🛴", "❓"], impactCount: 28, impactAnimation: "shake",
-      dataLegend: "9 個路口點位顯示電動平衡車通道。",
+      dataLegend: "9 個路口點位顯示電動平衡車通道；21 個 YouBike 站點（🚲）。",
       impactLegend: "紫色歪斜線與大量抖動平衡車符號誇張化新工具和日常動線不協調。"
     },
     "design-slow": {
       round: "5 交通設計", title: "減速街廓",
-      corridor: "green", showTrafficCounts: true,
+      corridor: "green", showTrafficCounts: true, showYoubike: true,
       conflictPoints: [{ index: 1, style: "warning" }, { index: 2, style: "warning" }, { index: 3, style: "warning" }, { index: 4, style: "warning" }],
       impactEmojis: ["🛑", "⚠️"], impactCount: 6, impactAnimation: "pulse",
-      dataLegend: "3 個 PCU 調查站；東豐、小東、青年、東門路口標示中等衝突風險 ⚠️。",
+      dataLegend: "3 個 PCU 調查站；21 個 YouBike 站點（🚲）；東豐、小東、青年、東門路口標示衝突風險。",
       impactLegend: "減速設施有效但主要路口仍有衝突壓力。"
     },
     "design-pedestrian": {
       round: "5 交通設計", title: "嚴格徒步限制",
-      corridor: "pedestrian", showTrafficCounts: true, showSidewalk: true,
+      corridor: "pedestrian", showTrafficCounts: true, showSidewalk: true, showYoubike: true,
       conflictPoints: [{ index: 0, style: "warning" }, { index: 2, style: "warning" }, { index: 3, style: "explosion" }, { index: 4, style: "explosion" }, { index: 5, style: "explosion" }],
       impactEmojis: ["🚶", "💥", "🚧"], impactCount: 10, impactAnimation: "shake",
-      dataLegend: "3 個 PCU 調查站；人行道多邊形（sidewalk_data.js）呈現徒步優先區域；青年、東門、府連路口為邊界爆炸衝突點。",
+      dataLegend: "3 個 PCU 調查站；人行道多邊形 + 21 個 YouBike 站點（🚲）；青年、東門、府連路口為邊界爆炸衝突點。",
       impactLegend: "車流被逼到徒步區邊界集中，入口處衝突最嚴重。"
     },
     "design-separated": {
       round: "5 交通設計", title: "人車分流",
-      corridor: "separated", showTrafficCounts: true,
+      corridor: "separated", showTrafficCounts: true, showYoubike: true,
       conflictPoints: [{ index: 7, style: "warning" }, { index: 8, style: "warning" }],
       impactEmojis: ["🚲", "🚶", "🧱"], impactCount: 10, impactAnimation: "pulse",
-      dataLegend: "3 個 PCU 調查站；白虛線為分流設計示意；中華東路口與生產路口仍有輕微衝突風險 ⚠️。",
+      dataLegend: "3 個 PCU 調查站；21 個 YouBike 站點（🚲）；白虛線為分流設計示意；南段末端路口仍有輕微衝突。",
       impactLegend: "實體分隔後衝突大幅降低，僅南段末端路口仍需注意。"
     },
     "design-scooter": {
       round: "5 交通設計", title: "電動平衡車專用道 L5",
-      corridor: "scooter", showTrafficCounts: true,
+      corridor: "scooter", showTrafficCounts: true, showYoubike: true,
       conflictPoints: [0,1,2,3,4,5,6,7,8].map(function(i) { return { index: i, style: "explosion" }; }),
       impactEmojis: ["🛴", "💥", "⚡"], impactCount: 34, impactAnimation: "shake", impactLarge: true,
-      dataLegend: "3 個 PCU 調查站；全部 9 個路口標示爆炸衝突點 💥。",
+      dataLegend: "3 個 PCU 調查站；21 個 YouBike 站點（🚲）；全部 9 個路口標示爆炸衝突點 💥。",
       impactLegend: "大量抖動平衡車、爆炸與閃電符號誇張化動線完全混亂。"
     },
     "housing-market": {
@@ -585,6 +637,75 @@
     });
   }
 
+  function getCentroid(coords) {
+    const lat = coords.reduce(function(s, pt) { return s + pt[0]; }, 0) / coords.length;
+    const lng = coords.reduce(function(s, pt) { return s + pt[1]; }, 0) / coords.length;
+    return [lat, lng];
+  }
+
+  function getParkSpread(coords) {
+    const lats = coords.map(function(pt) { return pt[0]; });
+    const lngs = coords.map(function(pt) { return pt[1]; });
+    const latR = Math.max.apply(null, lats) - Math.min.apply(null, lats);
+    const lngR = Math.max.apply(null, lngs) - Math.min.apply(null, lngs);
+    return Math.min(latR, lngR) * 0.28;
+  }
+
+  function getParkEmojis(mode) {
+    if (mode === "green-trees")   return ["🌳", "🌲", "🌳"];
+    if (mode === "green-flowers") return ["🌼", "🌷", "🌸", "🌱"];
+    if (mode === "green-flat")    return ["🌱", "🌱"];
+    if (mode === "green-eco")     return ["🌿", "🦋", "🌼", "🌳"];
+    if (mode === "blue-pool")     return ["🏊", "🌊", "🛟"];
+    return [];
+  }
+
+  function addParkPolygons(scene) {
+    if (!scene.showParks) return;
+    const mode = scene.showParks;
+    const isPool = mode === "blue-pool";
+    const color       = isPool ? "#1a6fa3" : "#2f6f3d";
+    const fillColor   = isPool ? "#2387c7" : "#3d8b5a";
+    const fillOpacity = isPool ? 0.30 : 0.22;
+    const emojis      = getParkEmojis(mode);
+    const anim        = isPool ? "float" : mode === "green-eco" ? "float" : mode === "green-flowers" ? "pop" : "pulse";
+
+    parkPolygons.forEach(function(park) {
+      L.polygon(park.coords, {
+        color: color, weight: 2, opacity: 0.72,
+        fillColor: fillColor, fillOpacity: fillOpacity
+      }).bindTooltip(park.name, { direction: "center" }).addTo(sceneLayer);
+
+      if (!emojis.length) return;
+      const center = getCentroid(park.coords);
+      const spread = getParkSpread(park.coords);
+      const count  = park.emojiCount;
+      for (var i = 0; i < count; i++) {
+        const angle = count === 1 ? 0 : (i / count) * Math.PI * 2;
+        const lat   = center[0] + Math.sin(angle) * spread;
+        const lng   = center[1] + Math.cos(angle) * spread;
+        L.marker([lat, lng], {
+          icon: makeImpactIcon(emojis[i % emojis.length], anim, false),
+          interactive: false
+        }).addTo(sceneLayer);
+      }
+    });
+  }
+
+  function addYoubikeSites(scene) {
+    if (!scene.showYoubike) return;
+    youbikeSites.forEach(function(site) {
+      L.marker([site.lat, site.lng], {
+        icon: L.divIcon({
+          className: "",
+          html: '<div style="font-size:15px;line-height:1;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.38));">🚲</div>',
+          iconSize: [20, 20],
+          iconAnchor: [10, 10]
+        })
+      }).bindTooltip("YouBike｜" + site.name, { direction: "top" }).addTo(sceneLayer);
+    });
+  }
+
   function addSidewalk(scene) {
     if (!scene.showSidewalk) return;
     const data = window.sidewalkData;
@@ -701,6 +822,8 @@
     addIntersections(scene);
     addConflictPoints(scene);
     addBridges(scene);
+    addParkPolygons(scene);
+    addYoubikeSites(scene);
     addHousing(scene);
     addImpactEffects(scene);
 
