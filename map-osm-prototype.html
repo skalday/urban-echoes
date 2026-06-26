@@ -383,6 +383,37 @@
       font-size: 10px;
     }
 
+    .leaflet-tooltip {
+      padding: 7px 9px;
+      border: 1px solid rgba(216, 208, 191, 0.92);
+      border-radius: 8px;
+      background: rgba(255, 253, 247, 0.96);
+      color: var(--ink);
+      box-shadow: 0 8px 18px rgba(8, 23, 18, 0.18);
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.35;
+      white-space: normal;
+      max-width: 230px;
+    }
+
+    .leaflet-tooltip-top::before {
+      border-top-color: rgba(255, 253, 247, 0.96);
+    }
+
+    .leaflet-tooltip-bottom::before {
+      border-bottom-color: rgba(255, 253, 247, 0.96);
+    }
+
+    .leaflet-tooltip-left::before {
+      border-left-color: rgba(255, 253, 247, 0.96);
+    }
+
+    .leaflet-tooltip-right::before {
+      border-right-color: rgba(255, 253, 247, 0.96);
+    }
+
     .signal-marker {
       display: grid;
       place-items: center;
@@ -489,6 +520,415 @@
       color: var(--ink);
     }
 
+    .map-tint {
+      position: absolute;
+      inset: 0;
+      z-index: 320;
+      pointer-events: none;
+      opacity: 0;
+      mix-blend-mode: multiply;
+      transition: opacity 0.18s ease, background 0.18s ease;
+    }
+
+    .map-tint.green {
+      opacity: 0.22;
+      background: #9ed8a8;
+    }
+
+    .map-tint.warm {
+      opacity: 0.22;
+      background: #f3b15c;
+    }
+
+    .map-tint.blue {
+      opacity: 0.28;
+      background: #7ec7f2;
+    }
+
+    .map-tint.red {
+      opacity: 0.18;
+      background: #e78273;
+    }
+
+    .map-scene-status {
+      position: absolute;
+      z-index: 500;
+      left: 12px;
+      top: 12px;
+      width: min(360px, calc(100% - 24px));
+      padding: 10px 12px;
+      border: 1px solid rgba(216, 208, 191, 0.85);
+      border-radius: 10px;
+      background: rgba(255, 253, 247, 0.93);
+      box-shadow: 0 8px 18px rgba(8, 23, 18, 0.2);
+      backdrop-filter: blur(8px);
+    }
+
+    .map-scene-status strong {
+      display: block;
+      color: var(--ink);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .map-scene-status span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.4;
+    }
+
+    .scene-card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      max-height: 300px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .scene-card {
+      min-height: 58px;
+      padding: 8px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf7;
+      color: var(--ink);
+      cursor: pointer;
+      text-align: left;
+      font-family: inherit;
+      box-shadow: 0 4px 10px rgba(8, 23, 18, 0.08);
+    }
+
+    .scene-card:hover,
+    .scene-card.active {
+      border-color: var(--green);
+      background: #edf7ed;
+    }
+
+    .scene-card.active {
+      box-shadow: inset 0 0 0 2px rgba(61, 139, 90, 0.28);
+    }
+
+    .scene-card small {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .scene-card b {
+      display: block;
+      color: var(--ink);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .emoji-marker {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      font-size: 18px;
+      line-height: 1;
+      filter: drop-shadow(0 2px 5px rgba(8, 23, 18, 0.38));
+    }
+
+    .emoji-marker.large {
+      width: 46px;
+      height: 46px;
+      font-size: 30px;
+    }
+
+    .impact-marker {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      font-size: 20px;
+      line-height: 1;
+      pointer-events: none;
+      filter: drop-shadow(0 2px 6px rgba(8, 23, 18, 0.32));
+    }
+
+    .impact-marker.pulse {
+      animation: impactPulse 1.2s ease-in-out infinite;
+    }
+
+    .impact-marker.float {
+      animation: impactFloat 2.6s ease-in-out infinite;
+    }
+
+    .impact-marker.shake {
+      animation: impactShake 0.72s ease-in-out infinite;
+    }
+
+    .impact-marker.pop {
+      animation: impactPop 1.1s ease-in-out infinite;
+    }
+
+    .impact-marker.large {
+      width: 52px;
+      height: 52px;
+      font-size: 32px;
+    }
+
+    .impact-line {
+      animation: dashFlow 1.4s linear infinite;
+    }
+
+    .impact-band {
+      position: absolute;
+      z-index: 330;
+      pointer-events: none;
+      inset: 0;
+      opacity: 0;
+    }
+
+    .impact-band.active {
+      opacity: 1;
+    }
+
+    .impact-band.heatwave {
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(211, 161, 63, 0.16) 0 8px,
+        transparent 8px 20px
+      );
+      animation: bandDrift 4s linear infinite;
+    }
+
+    .impact-band.flow {
+      background: repeating-linear-gradient(
+        90deg,
+        transparent 0 20px,
+        rgba(47, 111, 159, 0.22) 20px 26px,
+        transparent 26px 46px
+      );
+      animation: bandDrift 1.6s linear infinite;
+    }
+
+    .impact-band.gridlock {
+      background:
+        repeating-linear-gradient(0deg, rgba(184, 76, 66, 0.12) 0 4px, transparent 4px 18px),
+        repeating-linear-gradient(90deg, rgba(184, 76, 66, 0.12) 0 4px, transparent 4px 18px);
+      animation: bandBlink 1.2s ease-in-out infinite;
+    }
+
+    .impact-band.spark {
+      background: radial-gradient(circle at 20% 30%, rgba(139, 92, 246, 0.25), transparent 9%),
+        radial-gradient(circle at 65% 62%, rgba(139, 92, 246, 0.22), transparent 8%),
+        radial-gradient(circle at 42% 78%, rgba(255, 255, 255, 0.22), transparent 7%);
+      animation: bandBlink 0.8s ease-in-out infinite;
+    }
+
+    .impact-band.market {
+      background: repeating-linear-gradient(
+        135deg,
+        rgba(184, 76, 66, 0.14) 0 10px,
+        transparent 10px 26px
+      );
+      animation: bandDrift 2.8s linear infinite;
+    }
+
+    @keyframes bandDrift {
+      from { background-position: 0 0; }
+      to { background-position: 80px 0; }
+    }
+
+    @keyframes bandBlink {
+      0%, 100% { opacity: 0.55; }
+      50% { opacity: 0.18; }
+    }
+
+    @keyframes impactPulse {
+      0% { transform: scale(0.88); opacity: 0.72; }
+      50% { transform: scale(1.18); opacity: 1; }
+      100% { transform: scale(0.88); opacity: 0.72; }
+    }
+
+    @keyframes impactFloat {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0); }
+    }
+
+    @keyframes impactShake {
+      0%, 100% { transform: translateX(0) rotate(0deg); }
+      25% { transform: translateX(-3px) rotate(-4deg); }
+      75% { transform: translateX(3px) rotate(4deg); }
+    }
+
+    @keyframes impactPop {
+      0% { transform: scale(0.8); opacity: 0.55; }
+      45% { transform: scale(1.25); opacity: 1; }
+      100% { transform: scale(0.8); opacity: 0.55; }
+    }
+
+    @keyframes dashFlow {
+      from { stroke-dashoffset: 0; }
+      to { stroke-dashoffset: -28; }
+    }
+
+    .road-marker {
+      display: grid;
+      place-items: center;
+      min-width: 32px;
+      height: 28px;
+      padding: 0 5px;
+      border-radius: 999px;
+      background: rgba(255, 253, 247, 0.96);
+      border: 2px solid #2f6f9f;
+      color: #17231d;
+      box-shadow: 0 7px 14px rgba(8, 23, 18, 0.2);
+      font-size: 14px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .road-marker.warning {
+      border-color: #b84c42;
+      background: #fff0ec;
+    }
+
+    .road-marker.safe {
+      border-color: #3d8b5a;
+      background: #edf7ed;
+    }
+
+    .cross-marker {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      font-size: 13px;
+      line-height: 1.2;
+      white-space: nowrap;
+      box-shadow: 0 4px 10px rgba(8, 23, 18, 0.2);
+    }
+    .cross-marker.car {
+      background: rgba(255, 240, 235, 0.96);
+      border: 2px solid #b84c42;
+      color: #7a2020;
+    }
+    .cross-marker.bike {
+      background: rgba(237, 247, 237, 0.96);
+      border: 2px solid #3d8b5a;
+      color: #1e5c35;
+    }
+    .cross-marker.elevated {
+      background: rgba(255, 248, 220, 0.96);
+      border: 2px solid #d3a13f;
+      color: #7a5800;
+      box-shadow: 0 6px 14px rgba(211, 161, 63, 0.32);
+    }
+    .cross-marker.scooter {
+      background: rgba(243, 238, 255, 0.96);
+      border: 2px solid #8b5cf6;
+      color: #4c1d95;
+    }
+
+    .heat-legend-bar {
+      width: 100%;
+      height: 9px;
+      border-radius: 4px;
+      background: linear-gradient(to right, #3b82f6 0%, #facc15 60%, #ef4444 100%);
+      margin: 5px 0 2px;
+    }
+    .heat-legend-labels {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .housing-label {
+      display: grid;
+      place-items: center;
+      min-width: 42px;
+      height: 30px;
+      padding: 0 6px;
+      border-radius: 999px;
+      background: rgba(255, 253, 247, 0.94);
+      border: 2px solid #b84c42;
+      box-shadow: 0 7px 14px rgba(8, 23, 18, 0.2);
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .tree-data-marker {
+      display: grid;
+      place-items: center;
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(255, 253, 247, 0.9);
+      border-radius: 999px;
+      background: #2f8f50;
+      box-shadow: 0 4px 8px rgba(8, 23, 18, 0.22);
+    }
+
+    .tree-data-marker.sparse {
+      width: 10px;
+      height: 10px;
+      background: #7aa95c;
+    }
+
+    .tree-data-marker.regular {
+      background: #76a95d;
+    }
+
+    .traffic-data-marker {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border: 3px solid #fffdf7;
+      border-radius: 999px;
+      background: #b84c42;
+      color: #fffdf7;
+      box-shadow: 0 8px 16px rgba(8, 23, 18, 0.28);
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1.1;
+      text-align: center;
+    }
+
+    .legend-block {
+      display: grid;
+      gap: 7px;
+    }
+
+    .legend-row {
+      padding-top: 7px;
+      border-top: 1px solid rgba(216, 208, 191, 0.72);
+    }
+
+    .legend-row:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .legend-row b {
+      display: block;
+      margin-bottom: 2px;
+      color: var(--ink);
+      font-size: 11px;
+    }
+
+    .legend-row span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
     @media (max-width: 1080px) {
       .game-table-mock {
         height: auto;
@@ -498,6 +938,10 @@
 
       .map-zone {
         min-height: 320px;
+      }
+
+      .scene-card-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
   </style>
@@ -515,12 +959,11 @@
       <section class="left-zone-mock">
         <div class="map-zone">
           <div id="map"></div>
-          <div class="map-layer-tabs">
-            <button class="active" id="layer-plant" type="button" onclick="setMapLayer('plant')">植栽圖層</button>
-            <button id="layer-traffic" type="button" onclick="setMapLayer('traffic')">交通圖層</button>
-            <button id="layer-housing" type="button" onclick="setMapLayer('housing')">房價圖層</button>
-            <button id="layer-design" type="button" onclick="setMapLayer('design')">設計路段</button>
-            <button id="layer-all" type="button" onclick="setMapLayer('all')">全部訊號</button>
+          <div class="map-tint" id="mapTint"></div>
+          <div class="impact-band" id="impactBand"></div>
+          <div class="map-scene-status" id="mapSceneStatus">
+            <strong>景觀休憩</strong>
+            <span>hover 或點選右下卡牌，地圖會以單一動態圖層重繪。</span>
           </div>
           <div class="map-legend" id="mapLegend"></div>
         </div>
@@ -553,7 +996,7 @@
 
         <section class="mock-panel">
           <h2>選擇牌區</h2>
-          <p>後續可以測試：不同事件回合自動切換預設圖層，例如植栽回合顯示植栽圖層，交通回合顯示交通圖層。</p>
+          <div class="scene-card-grid" id="sceneCards"></div>
         </section>
       </section>
     </main>
@@ -564,11 +1007,432 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <script src="材料/housing_heat.js"></script>
+  <script src="材料/housing_points.js"></script>
+  <script src="材料/tree_data.js"></script>
+  <script src="材料/sidewalk_data.js"></script>
   <script>
     const greenwayBounds = L.latLngBounds(
       [22.957537, 120.188143],
       [23.032044, 120.242559]
     );
+
+    const northCorridor = [
+      [23.019625, 120.224447],
+      [23.005901, 120.214845],
+      [23.005038, 120.214534],
+      [23.001572, 120.214019]
+    ];
+
+    const southCorridor = [
+      [22.994451, 120.212592],
+      [22.991538, 120.211938],
+      [22.990441, 120.212066],
+      [22.989523, 120.212356],
+      [22.971417, 120.217806],
+      [22.962181, 120.217313],
+      [22.960482, 120.217570]
+    ];
+
+    const allCorridor = [...northCorridor, ...southCorridor];
+
+    const bridgeNodes = [
+      { name: "民族路高架橋", lat: 22.994439, lng: 120.212663 },
+      { name: "林森路高架橋", lat: 22.981873, lng: 120.214708 }
+    ];
+
+    const elevatedGreenwayBounds = [
+      [22.994605, 120.211809],
+      [22.994605, 120.215113],
+      [22.981883, 120.215113],
+      [22.981883, 120.211809]
+    ];
+
+    const intersections = [
+      { name: "長榮路口", lat: 23.012767, lng: 120.219524 },
+      { name: "東豐路口", lat: 23.003968, lng: 120.214337 },
+      { name: "小東路口", lat: 23.001553, lng: 120.213945 },
+      { name: "青年路口", lat: 22.991499, lng: 120.211997 },
+      { name: "東門路口", lat: 22.988619, lng: 120.212554 },
+      { name: "府連路口", lat: 22.985327, lng: 120.213554 },
+      { name: "榮譽街口", lat: 22.974532, lng: 120.216984 },
+      { name: "中華東路口", lat: 22.972989, lng: 120.217473 },
+      { name: "生產路口", lat: 22.964718, lng: 120.217478 }
+    ];
+
+    const stations = [
+      { name: "臺鐵大橋車站", lat: 23.019625, lng: 120.224447 },
+      { name: "臺鐵台南車站", lat: 22.996928, lng: 120.213176 },
+      { name: "臺鐵林森站", lat: 22.977343, lng: 120.216191 },
+      { name: "臺鐵南臺南站", lat: 22.965715, lng: 120.217510 }
+    ];
+
+    const youbikeSites = [
+      { name: "大橋車站(北側)", lat: 23.019732, lng: 120.224383 },
+      { name: "大橋車站(南側)", lat: 23.019503, lng: 120.224568 },
+      { name: "永祥公園", lat: 23.015654, lng: 120.220231 },
+      { name: "成功國中", lat: 23.008901, lng: 120.216980 },
+      { name: "勝安香草運動公園", lat: 23.006096, lng: 120.216170 },
+      { name: "臺南二中", lat: 23.004055, lng: 120.213480 },
+      { name: "台南公園(公園南路)", lat: 23.004171, lng: 120.213389 },
+      { name: "小東前鋒", lat: 23.001186, lng: 120.214945 },
+      { name: "臺南文化創意產業園區", lat: 22.999594, lng: 120.212821 },
+      { name: "臺南車站(前站一)", lat: 22.997878, lng: 120.212443 },
+      { name: "臺南車站(前站二)", lat: 22.997737, lng: 120.211990 },
+      { name: "臺南車站(前站三)", lat: 22.996762, lng: 120.211882 },
+      { name: "臺南車站(前鋒路)", lat: 22.997364, lng: 120.213819 },
+      { name: "北門衛民", lat: 22.993196, lng: 120.211595 },
+      { name: "知事官邸生活館", lat: 22.992500, lng: 120.212955 },
+      { name: "萬昌街停車場", lat: 22.991174, lng: 120.210469 },
+      { name: "疾病管制署南區管制中心", lat: 22.965721, lng: 120.215993 },
+      { name: "大同公英", lat: 22.971252, lng: 120.214911 },
+      { name: "大林派出所", lat: 22.973697, lng: 120.214634 },
+      { name: "立德一路5巷", lat: 22.976400, lng: 120.214437 },
+      { name: "崇明五街停車場", lat: 22.979835, lng: 120.217287 }
+    ];
+
+    const trafficCountStations = [
+      {
+        name: "牛稠仔",
+        route: "台1線",
+        lat: 22.96467,
+        lng: 120.21628,
+        pcu: 47085,
+        groupStrength: 1
+      },
+      {
+        name: "台南公園（北門路）",
+        route: "台20線",
+        lat: 23.00069,
+        lng: 120.21297,
+        pcu: 27262,
+        groupStrength: 0.579
+      },
+      {
+        name: "高等法院（中山路）",
+        route: "台20線",
+        lat: 22.99558,
+        lng: 120.20956,
+        pcu: 18639,
+        groupStrength: 0.396
+      }
+    ];
+
+    const cardScenes = {
+      "vision-rest": {
+        round: "1 都市願景",
+        title: "景觀休憩",
+        tint: "green",
+        corridor: "green",
+        impactEmojis: ["🌳", "🪑", "🚶"],
+        impactCount: 12,
+        impactAnimation: "float",
+        dataLegend: "綠廊道北段 / 南段線段與 4 個車站點位。",
+        impactLegend: "柔和綠色濾鏡與浮動休憩符號，誇張化安靜散步、停留、樹蔭的城市想像。"
+      },
+      "vision-commerce": {
+        round: "1 都市願景",
+        title: "商業活化",
+        tint: "warm",
+        corridor: "green",
+        showSites: true,
+        impactEmojis: ["☕", "🛍️", "🏪", "💸"],
+        impactCount: 14,
+        impactAnimation: "pop",
+        dataLegend: "YouBike 站點作為沿線可觀察節點；這些點不是商家資料。",
+        impactLegend: "暖色濾鏡與跳動商業符號表現人流、消費與活化想像。"
+      },
+      "vision-traffic": {
+        round: "1 都市願景",
+        title: "交通轉化",
+        corridor: "traffic",
+        showBikeHint: true,
+        showIntersections: "points",
+        showBridges: true,
+        showTrafficCounts: true,
+        impactEmojis: ["🚲", "🚶", "🚉"],
+        impactCount: 10,
+        impactAnimation: "pulse",
+        dataLegend: "綠廊線段、9 個路口、2 個高架橋點位、4 個車站，以及 3 個 PCU/日交通量調查站。",
+        impactLegend: "藍色虛線強化路網轉型感；PCU 顯示現況車流壓力。"
+      },
+      "vision-pool": {
+        round: "1 都市願景",
+        title: "大游泳池 L1",
+        tint: "blue",
+        corridor: "blue",
+        corridorWeight: 20,
+        impactEmojis: ["🏊", "🌊", "🛟"],
+        impactCount: 16,
+        impactAnimation: "float",
+        dataLegend: "廊道線段加粗變藍（weight 20），表現廊道「淹水」成水道的荒謬感。",
+        impactLegend: "廊道線寬擴大為水道，游泳池符號沿線漂浮，暗示政策與空間尺度錯位。"
+      },
+      "landscape-plaza": {
+        round: "2 景觀願景",
+        title: "空曠廣場",
+        corridor: "green",
+        treeMode: "none",
+        impactEmojis: ["⬜", "🧱", "☀️"],
+        impactCount: 10,
+        impactAnimation: "pulse",
+        dataLegend: "廊道線段；刻意不顯示行道樹，呈現空曠硬鋪面狀態。",
+        impactLegend: "行道樹消失，廣場硬鋪面增加，曝曬感上升。"
+      },
+      "landscape-trees": {
+        round: "2 景觀願景",
+        title: "很多高大的樹",
+        tint: "green",
+        corridor: "green",
+        treeMode: "dense",
+        corridorPlant: "trees",
+        sightlineWarnings: [1, 4],
+        impactEmojis: ["🌳", "🌲", "🌳"],
+        impactCount: 14,
+        impactAnimation: "float",
+        dataLegend: "真實行道樹點位（tree_data.js）+ 廊道上隨機補植樹木符號；東豐路口（index 1）與東門路口（index 4）加視線受阻警示。",
+        impactLegend: "密植樹冠強化遮蔭感；路口視線警示呼應高齡居民真實抱怨。"
+      },
+      "landscape-flowers": {
+        round: "2 景觀願景",
+        title: "低矮草和花",
+        corridor: "green",
+        treeMode: "sparse",
+        corridorPlant: "flowers",
+        impactEmojis: ["🌼", "🌷", "🌱"],
+        impactCount: 12,
+        impactAnimation: "pop",
+        dataLegend: "稀疏行道樹點位 + 花草符號沿廊道分布，加「需持續維護 →」提示標籤。",
+        impactLegend: "植栽密度下降，花草填補空間，但維護標籤暗示後續成本。"
+      },
+      "landscape-pool": {
+        round: "2 景觀願景",
+        title: "大游泳池 L2",
+        tint: "blue",
+        corridor: "blue",
+        corridorWeight: 30,
+        impactEmojis: ["🏊", "🌊", "🤿", "🛟"],
+        impactCount: 26,
+        impactAnimation: "float",
+        impactLarge: true,
+        dataLegend: "廊道線段繼續加粗（weight 30），水道擴張感超越 L1。",
+        impactLegend: "水池範圍再次擴大，廊道藍色更寬，荒謬方案持續壓過綠廊。"
+      },
+      "maintenance-plaza": {
+        round: "3 景觀維護",
+        title: "廣場維護",
+        corridor: "green",
+        treeMode: "none",
+        impactEmojis: ["🧹", "⬜", "🧽"],
+        impactCount: 10,
+        impactAnimation: "pulse",
+        dataLegend: "使用綠廊線段；本牌不顯示行道樹 KML 點位，代表維護對象偏硬鋪面。",
+        impactLegend: "清潔與空地符號表現低複雜度維護，也暗示空間可能變單調。"
+      },
+      "maintenance-flat": {
+        round: "3 景觀維護",
+        title: "扁平單一植栽",
+        corridor: "green",
+        treeMode: "regular",
+        impactEmojis: ["🌱", "🌱", "📋"],
+        impactCount: 16,
+        impactAnimation: "pulse",
+        dataLegend: "以 tree_data.js 抽樣真實樹點，採較規律取樣呈現標準化管理感。",
+        impactLegend: "重複植栽與排程符號誇張化單一、好管、但缺乏多樣性的維護路線。"
+      },
+      "maintenance-eco": {
+        round: "3 景觀維護",
+        title: "自然生態圈",
+        tint: "green",
+        corridor: "green",
+        treeMode: "dense",
+        corridorPlant: "trees",
+        impactEmojis: ["🌿", "🪲", "🦋", "🌼"],
+        impactCount: 18,
+        impactAnimation: "float",
+        dataLegend: "抽樣顯示 tree_data.js 的真實行道樹點位。",
+        impactLegend: "浮動昆蟲與雜生植物符號表現生態豐富，也暗示維護邊界變模糊。"
+      },
+      "maintenance-pool": {
+        round: "3 景觀維護",
+        title: "大游泳池維護 L3",
+        tint: "blue",
+        corridor: "blue",
+        corridorWeight: 30,
+        impactEmojis: ["🚧", "🧹", "💸", "🛟"],
+        impactCount: 24,
+        impactAnimation: "shake",
+        impactLarge: true,
+        dataLegend: "廊道藍色寬線延續 L2（weight 30），但符號全換成維護場景。",
+        impactLegend: "龐大水池後續維護失控；抖動的維修與費用符號誇張化維護壓力。"
+      },
+      "traffic-car": {
+        round: "4 交通政策",
+        title: "汽機車",
+        corridor: "car",
+        showIntersections: "r4-car",
+        showBridges: false,
+        impactEmojis: ["🚗", "🛵", "💨"],
+        impactCount: 12,
+        impactAnimation: "shake",
+        dataLegend: "9 個路口顯示汽機車平面穿越；高架橋不建，廊道連續性最差。",
+        impactLegend: "廊道灰暗、路口允許車輛平面通過，凸顯綠廊被切斷。"
+      },
+      "traffic-bike": {
+        round: "4 交通政策",
+        title: "自行車步行優先",
+        tint: "green",
+        corridor: "connected",
+        showIntersections: "r4-bike",
+        showBridges: true,
+        impactEmojis: ["🚲", "🚶", "✨"],
+        impactCount: 14,
+        impactAnimation: "float",
+        dataLegend: "9 個路口全部轉為禁止汽機車（🚲🚶）；2 座高架橋保留。",
+        impactLegend: "廊道全線連貫，所有路口禁止汽機車，展現最高優先的慢行政策。"
+      },
+      "traffic-mixed": {
+        round: "4 交通政策",
+        title: "混合",
+        corridor: "mixed",
+        showIntersections: "r4-mixed",
+        showBridges: true,
+        impactEmojis: ["🚗", "🚲", "↔️"],
+        impactCount: 10,
+        impactAnimation: "pulse",
+        dataLegend: "立體綠廊範圍內路口（青年、東門、府連）高架化；其餘 6 個路口維持汽機車平面穿越；2 座高架橋。",
+        impactLegend: "部分高架保護、部分維持車道穿越，折衷帶來複雜性。"
+      },
+      "traffic-scooter": {
+        round: "4 交通政策",
+        title: "電動平衡車 L4",
+        corridor: "scooter",
+        showIntersections: "r4-scooter",
+        impactEmojis: ["🛴", "🛴", "❓"],
+        impactCount: 28,
+        impactAnimation: "shake",
+        dataLegend: "9 個路口點位顯示電動平衡車通道。",
+        impactLegend: "紫色歪斜線與大量抖動平衡車符號誇張化新工具和日常動線不協調。"
+      },
+      "design-slow": {
+        round: "5 交通設計",
+        title: "減速街廓",
+        corridor: "green",
+        showTrafficCounts: true,
+        conflictPoints: [
+          { index: 1, style: "warning" },
+          { index: 2, style: "warning" },
+          { index: 3, style: "warning" },
+          { index: 4, style: "warning" }
+        ],
+        impactEmojis: ["🛑", "⚠️"],
+        impactCount: 6,
+        impactAnimation: "pulse",
+        dataLegend: "3 個 PCU 調查站；東豐、小東、青年、東門路口標示中等衝突風險 ⚠️。",
+        impactLegend: "減速設施有效但主要路口仍有衝突壓力。"
+      },
+      "design-pedestrian": {
+        round: "5 交通設計",
+        title: "嚴格徒步限制",
+        corridor: "pedestrian",
+        showTrafficCounts: true,
+        showSidewalk: true,
+        conflictPoints: [
+          { index: 0, style: "warning" },
+          { index: 2, style: "warning" },
+          { index: 3, style: "explosion" },
+          { index: 4, style: "explosion" },
+          { index: 5, style: "explosion" }
+        ],
+        impactEmojis: ["🚶", "💥", "🚧"],
+        impactCount: 10,
+        impactAnimation: "shake",
+        dataLegend: "3 個 PCU 調查站；人行道多邊形（sidewalk_data.js）呈現徒步優先區域；青年、東門、府連路口為邊界爆炸衝突點。",
+        impactLegend: "車流被逼到徒步區邊界集中，入口處衝突最嚴重。"
+      },
+      "design-separated": {
+        round: "5 交通設計",
+        title: "人車分流",
+        corridor: "separated",
+        showTrafficCounts: true,
+        conflictPoints: [
+          { index: 7, style: "warning" },
+          { index: 8, style: "warning" }
+        ],
+        impactEmojis: ["🚲", "🚶", "🧱"],
+        impactCount: 10,
+        impactAnimation: "pulse",
+        dataLegend: "3 個 PCU 調查站；白虛線為分流設計示意；中華東路口與生產路口仍有輕微衝突風險 ⚠️。",
+        impactLegend: "實體分隔後衝突大幅降低，僅南段末端路口仍需注意。"
+      },
+      "design-scooter": {
+        round: "5 交通設計",
+        title: "電動平衡車專用道 L5",
+        corridor: "scooter",
+        showTrafficCounts: true,
+        conflictPoints: [0,1,2,3,4,5,6,7,8].map(function(i){ return { index: i, style: "explosion" }; }),
+        impactEmojis: ["🛴", "💥", "⚡"],
+        impactCount: 34,
+        impactAnimation: "shake",
+        impactLarge: true,
+        dataLegend: "3 個 PCU 調查站；全部 9 個路口標示爆炸衝突點 💥。",
+        impactLegend: "大量抖動平衡車、爆炸與閃電符號誇張化動線完全混亂。"
+      },
+      "housing-market": {
+        round: "6 房價政策",
+        title: "市場自然發展",
+        corridor: "green",
+        housing: "neutral",
+        impactEmojis: ["🏠", "🏢"],
+        impactCount: 8,
+        impactAnimation: "pulse",
+        dataLegend: "housing_heat.js 同一套房價熱力圖，以及 housing_points.geojson 的建物型態與百分位資料。",
+        impactLegend: "少量住宅符號表現市場自然變動；四張房價牌的熱力圖色階固定一致。"
+      },
+      "housing-justice": {
+        round: "6 房價政策",
+        title: "居住正義保障",
+        corridor: "green",
+        housing: "protected",
+        impactEmojis: ["🛡️", "🏠", "＝"],
+        impactCount: 14,
+        impactAnimation: "pulse",
+        dataLegend: "與其他房價牌相同的熱力圖與 housing_points.geojson 點位。",
+        impactLegend: "保護與穩定符號是政策介入示意；不改變房價資料本身的色階。"
+      },
+      "housing-develop": {
+        round: "6 房價政策",
+        title: "招商開發優先",
+        corridor: "red",
+        housing: "develop",
+        impactEmojis: ["🏗️", "🏢", "↗️", "💸"],
+        impactCount: 20,
+        impactAnimation: "pop",
+        dataLegend: "與其他房價牌相同的房價熱力圖；高百分位交易點以建物增長符號標示。",
+        impactLegend: "開發、上升與金錢符號誇張化招商後的開發壓力與居住排擠感。"
+      },
+      "housing-cyber": {
+        round: "6 房價政策",
+        title: "賽博龐克大樓 L6",
+        corridor: "blue",
+        housing: "cyber",
+        impactEmojis: ["🏙️", "✨", "📈", "💸"],
+        impactCount: 24,
+        impactAnimation: "pop",
+        impactLarge: true,
+        dataLegend: "與其他房價牌相同的房價熱力圖與交易點位；巨大建物是荒謬政策示意。",
+        impactLegend: "巨大未來建物、閃光與上升符號誇張化脫離街區尺度的開發想像。"
+      }
+    };
+
+    const sceneOrder = Object.keys(cardScenes);
+    let activeSceneId = "vision-rest";
+    let lockedSceneId = "vision-rest";
+    let housingPointData = null;
+    let housingFetchStarted = false;
+    let activeHeatLayer = null;
+    let sidewalkLayerGroup = null;
 
     const map = L.map("map", {
       zoomControl: false,
@@ -600,605 +1464,600 @@
       collapsed: true
     }).addTo(map);
 
-    map.createPane("designPane");
-    map.getPane("designPane").style.zIndex = 450;
-    map.getPane("designPane").style.pointerEvents = "auto";
+    const sceneLayer = L.layerGroup().addTo(map);
+    const staticLayer = L.layerGroup().addTo(map);
 
-    const corridorPath = [
-      [23.0045, 120.2122],
-      [22.9979, 120.2136],
-      [22.9918, 120.2157],
-      [22.9853, 120.2168],
-      [22.9765, 120.2183],
-      [22.9678, 120.2200]
-    ];
-
-    const corridorLayer = L.polyline(corridorPath, {
-      color: "#2f7f50",
-      weight: 9,
-      opacity: 0.78,
-      lineCap: "round",
-      lineJoin: "round"
-    }).addTo(map);
-
-    L.polyline(corridorPath, {
-      color: "#fffdf7",
-      weight: 3,
-      opacity: 0.82,
-      dashArray: "10 12",
-      lineCap: "round"
-    }).addTo(map);
-
-    const stationGap = L.circleMarker([22.9972, 120.2138], {
-      radius: 7,
-      color: "#fffdf7",
-      weight: 3,
-      fillColor: "#d3a13f",
-      fillOpacity: 1
-    }).addTo(map);
-
-    stationGap.bindTooltip("台南火車站段：非本案主要範圍", {
-      permanent: false,
-      direction: "top"
+    stations.forEach((station) => {
+      L.circleMarker([station.lat, station.lng], {
+        radius: 5,
+        color: "#fffdf7",
+        weight: 2,
+        fillColor: "#66726c",
+        fillOpacity: 0.82
+      })
+        .bindTooltip(station.name, { direction: "top" })
+        .addTo(staticLayer);
     });
 
-    const mapLayers = {
-      plant: {
-        title: "植栽圖層",
-        note: "測試資料：用少量政策訊號標示遮蔭不足、補植機會、維護壓力與視線遮蔽。",
-        markerClass: "plant",
-        markers: [
-          {
-            code: "植",
-            title: "可補植喬木",
-            lat: 23.0064,
-            lng: 120.2117,
-            evidence: "北段接近校園與社區路徑，適合補強連續遮蔭。",
-            policyMeaning: "支持遮蔭優先，但需要同步規劃根系、鋪面與維護契約。",
-            affects: "高齡在地居民 +，青年在地居民 +，治理壓力 +"
-          },
-          {
-            code: "蔭",
-            title: "遮蔭不足",
-            lat: 22.9862,
-            lng: 120.2164,
-            evidence: "南段通勤路徑較長，步行舒適度受日照影響。",
-            policyMeaning: "若本局選擇步行優先，這裡是容易被看見的改善點。",
-            affects: "高齡在地居民 +，青年短居學生 +"
-          },
-          {
-            code: "修",
-            title: "維護壓力",
-            lat: 22.9746,
-            lng: 120.2189,
-            evidence: "綠帶與道路並行，落葉、修剪與照明維護會影響日常使用。",
-            policyMeaning: "密植綠廊需要搭配維護契約，不然容易轉成安全疑慮。",
-            affects: "輿論報導 +，高齡在地居民 -"
-          }
-        ]
-      },
-      traffic: {
-        title: "交通圖層",
-        note: "測試資料：標示自行車斷點、人車衝突、轉乘機會與家長接送 / 防災動線。",
-        markerClass: "traffic",
-        markers: [
-          {
-            code: "車",
-            title: "自行車斷點",
-            lat: 23.0018,
-            lng: 120.2128,
-            evidence: "北段靠近重要橫向道路，騎乘連續性容易被路口切斷。",
-            policyMeaning: "適合測試自行車優先或人車分流選項。",
-            affects: "青年短居學生 +，青年在地居民 +"
-          },
-          {
-            code: "轉",
-            title: "轉乘機會",
-            lat: 22.9954,
-            lng: 120.2144,
-            evidence: "火車站與通勤站周邊可作為綠廊交通節點。",
-            policyMeaning: "若選轉乘節點，地圖可以指出路廊和公共運輸的連接。",
-            affects: "青年短居學生 +，輿論報導 +"
-          },
-          {
-            code: "慢",
-            title: "交通寧靜區",
-            lat: 22.9817,
-            lng: 120.2171,
-            evidence: "設計簡報提到南段漸進式交通與雙向道路調整。",
-            policyMeaning: "適合放入減速街廓、步行優先與社區共存的選項脈絡。",
-            affects: "青年在地居民 +，高齡在地居民 +"
-          }
-        ]
-      },
-      housing: {
-        title: "房價圖層",
-        note: "測試資料：用風險點先代替熱區，標示房價壓力、租金風險、增值熱區與社宅串接。",
-        markerClass: "housing",
-        markers: [
-          {
-            code: "價",
-            title: "增值熱區",
-            lat: 23.0038,
-            lng: 120.2109,
-            evidence: "綠廊開發、校園與通勤節點會提高周邊可見度。",
-            policyMeaning: "商業活化可能提高討論度，但也會放大租金與居住排擠疑慮。",
-            affects: "輿論報導 +，青年短居學生 -，青年在地居民 -"
-          },
-          {
-            code: "租",
-            title: "租金風險",
-            lat: 22.9928,
-            lng: 120.2148,
-            evidence: "車站與生活機能附近可能先感受到租屋壓力。",
-            policyMeaning: "適合對應租金預警、房價監測與學生租屋焦慮。",
-            affects: "青年短居學生 -，青年在地居民 -"
-          },
-          {
-            code: "宅",
-            title: "社宅串接",
-            lat: 22.9785,
-            lng: 120.2182,
-            evidence: "若路廊改善能串起居住支持，商業化壓力會比較可控。",
-            policyMeaning: "適合測試社宅串接與社區共存路線。",
-            affects: "青年在地居民 +，高齡在地居民 +"
-          }
-        ]
-      }
-    };
-
-    const markerLayer = L.layerGroup().addTo(map);
-    const designSegmentLayer = L.layerGroup().addTo(map);
-    let activeMapLayer = "plant";
-
-    const designSegments = [
-      {
-        title: "北段北：線型公園 / 鄰里共園",
-        label: "柴頭港溪－實踐街",
-        theme: "藍綠帶延伸、古地景再造、可食地景、社區生活場域。",
-        source: "設計簡報第 47-49 頁",
-        color: "#3d8b5a",
-        center: [23.0260, 120.2070],
-        path: [
-          [23.0295, 120.2010],
-          [23.0240, 120.2040],
-          [23.0192, 120.2078]
-        ]
-      },
-      {
-        title: "北段北：實踐社區生活公園",
-        label: "實踐街－長榮路",
-        theme: "整合實踐公園與園道綠帶，處理社區生活與車行動線。",
-        source: "設計簡報第 50-51 頁",
-        color: "#4f9d69",
-        center: [23.0171, 120.2058],
-        path: [
-          [23.0192, 120.2078],
-          [23.0142, 120.2102]
-        ]
-      },
-      {
-        title: "北段北：三校共構勤學之道",
-        label: "長榮路－和緯路",
-        theme: "家長接送區、社區共享客廳、城市農場、共融遊具、通勤自行車道與校門出入口轉向。",
-        source: "設計簡報第 52-55 頁",
-        color: "#76a95d",
-        center: [23.0110, 120.2075],
-        path: [
-          [23.0142, 120.2102],
-          [23.0090, 120.2117],
-          [23.0057, 120.2125]
-        ]
-      },
-      {
-        title: "北段南：通學綠廊 + 社區道路",
-        label: "和緯路－小東路",
-        theme: "園道作為防災動線與通學路徑，配置水廊、LID、社區道路與遺構展示。",
-        source: "設計簡報第 59-63 頁",
-        color: "#2f8f8a",
-        center: [23.0010, 120.2093],
-        path: [
-          [23.0057, 120.2125],
-          [23.0012, 120.2134],
-          [22.9980, 120.2140]
-        ]
-      },
-      {
-        title: "車站段：樞紐綠環（非本工程範圍）",
-        label: "小東路－民族路",
-        theme: "配合臺南火車站工程願景，作為北段與南段的通學、車站與遺構連通樞紐。",
-        source: "設計簡報第 67-70 頁",
-        color: "#d3a13f",
-        dashArray: "10 10",
-        center: [22.9950, 120.2092],
-        path: [
-          [22.9980, 120.2140],
-          [22.9950, 120.2148],
-          [22.9915, 120.2156]
-        ]
-      },
-      {
-        title: "南段北：府城歷史人文散策",
-        label: "民族路－青年路－東門路",
-        theme: "全綠帶園道、彈性人本道路、歷史街區導覽、市民文化廣場、兒童遊樂與假日活動。",
-        source: "設計簡報第 72-83 頁",
-        color: "#6aa84f",
-        center: [22.9880, 120.2118],
-        path: [
-          [22.9915, 120.2156],
-          [22.9878, 120.2165],
-          [22.9837, 120.2173]
-        ]
-      },
-      {
-        title: "南段中：林蔭漫步廊帶",
-        label: "東門路－林森路",
-        theme: "西側全綠帶 + 交通寧靜區，包含 5.5m 雙向巷道、2m 人行道與 1.5m 連續綠帶。",
-        source: "設計簡報第 84-89 頁",
-        color: "#2f6f9f",
-        center: [22.9795, 120.2127],
-        path: [
-          [22.9837, 120.2173],
-          [22.9803, 120.2178],
-          [22.9768, 120.2184]
-        ]
-      },
-      {
-        title: "南段南：市民綠色大道",
-        label: "林森路－生產路－大同路",
-        theme: "西側全綠帶 + 7m 雙向道路，串接通勤自行車道、林森通勤站、南臺南通勤站、水廊與避難廣場。",
-        source: "設計簡報第 90-97 頁",
-        color: "#b84c42",
-        center: [22.9680, 120.2146],
-        path: [
-          [22.9768, 120.2184],
-          [22.9718, 120.2195],
-          [22.9660, 120.2207],
-          [22.9605, 120.2220]
-        ]
-      }
-    ];
-
-    const designBoundaries = [
-      { name: "實踐街", lat: 23.0192, lng: 120.2078, angle: -28 },
-      { name: "長榮路", lat: 23.0142, lng: 120.2102, angle: -26 },
-      { name: "和緯路", lat: 23.0057, lng: 120.2125, angle: -24 },
-      { name: "小東路", lat: 22.9980, lng: 120.2140, angle: -22 },
-      { name: "民族路", lat: 22.9915, lng: 120.2156, angle: -20 },
-      { name: "東門路", lat: 22.9837, lng: 120.2173, angle: -18 },
-      { name: "林森路", lat: 22.9768, lng: 120.2184, angle: -15 },
-      { name: "中華東路", lat: 22.9702, lng: 120.2198, angle: -14 },
-      { name: "生產路", lat: 22.9652, lng: 120.2212, angle: -12 }
-    ];
-
-    const designFacilities = [
-      {
-        type: "fill",
-        code: "填",
-        title: "長榮路地下道填平",
-        lat: 23.0142,
-        lng: 120.2102,
-        evidence: "第 140 頁：長榮路五段地下道，處理方式為填平地下道，未來穿越園道。",
-        policyMeaning: "由立體穿越轉為平面穿越，會改變車流、步行穿越與綠帶連續性。",
-        affects: "交通圖層 +，高齡在地居民安全感 +"
-      },
-      {
-        type: "remove",
-        code: "拆",
-        title: "開元國小人行陸橋拆除",
-        lat: 23.0060,
-        lng: 120.2125,
-        evidence: "第 140 頁：和緯路一段開元國小人行陸橋，拆除後新闢號誌化四叉路口。",
-        policyMeaning: "從垂直穿越改為平面號誌，需評估通學安全與家長接送。",
-        affects: "交通圖層 +，青年在地居民 +"
-      },
-      {
-        type: "remove",
-        code: "拆",
-        title: "開元陸橋拆除",
-        lat: 23.0025,
-        lng: 120.2132,
-        evidence: "第 140 頁：開元陸橋拆除，改設號誌化三叉路口。",
-        policyMeaning: "平面化後有利園道連續，但路口容量與慢行安全需同步設計。",
-        affects: "交通圖層 +，輿論報導 +"
-      },
-      {
-        type: "fill",
-        code: "填",
-        title: "小東路地下道填平",
-        lat: 22.9980,
-        lng: 120.2140,
-        evidence: "第 140 頁：小東路地下道填平，未來穿越園道，由工務局本案處理。",
-        policyMeaning: "車站段與北段銜接處的重要平面化節點。",
-        affects: "交通圖層 +，青年短居學生 +"
-      },
-      {
-        type: "elevated",
-        code: "橋",
-        title: "民族路壽陸橋抬高 / 人行自行車高架橋",
-        lat: 22.9915,
-        lng: 120.2156,
-        evidence: "第 11、73 頁：壽陸橋抬高，民族路順平；會議文字提到橫跨民族路人行與自行車高架橋。",
-        policyMeaning: "此處不是單純平面化，而是用立體連通維持人行與自行車連續。",
-        affects: "交通圖層 +，植栽遮蔭 +，輿論報導 +"
-      },
-      {
-        type: "remove",
-        code: "拆",
-        title: "東門路陸橋拆除",
-        lat: 22.9837,
-        lng: 120.2173,
-        evidence: "第 140 頁：東門路三段東門路陸橋拆除，改設號誌化四叉路口。",
-        policyMeaning: "東門圓環與歷史街區活動要同步處理過街、視線與自行車中繼。",
-        affects: "交通圖層 +，高齡在地居民 +"
-      },
-      {
-        type: "elevated",
-        code: "橋",
-        title: "東門路人行自行車高架橋構想",
-        lat: 22.9824,
-        lng: 120.2178,
-        evidence: "會議摘要：為連結東門圓環與東門路以南人行自行車，在東門路上方設置橫跨天橋。",
-        policyMeaning: "與東門路陸橋拆除不同，這是慢行系統的立體連通構想。",
-        affects: "交通圖層 +，青年短居學生 +"
-      },
-      {
-        type: "fill",
-        code: "填",
-        title: "林森路大同地下道填平",
-        lat: 22.9768,
-        lng: 120.2184,
-        evidence: "第 140 頁：林森路一段林森路大同地下道填平，改設號誌化四叉路口。",
-        policyMeaning: "南段中與南段南的分界，也是通勤站與綠帶銜接點。",
-        affects: "交通圖層 +，青年短居學生 +"
-      },
-      {
-        type: "elevated",
-        code: "橋",
-        title: "林森路人行自行車高架橋構想",
-        lat: 22.9755,
-        lng: 120.2190,
-        evidence: "會議摘要：為連結林森通勤站與林森路以南人行自行車，在林森路上方設置橫跨天橋。",
-        policyMeaning: "可支撐通勤、自行車與通學路線，但需注意視覺、維護與夜間安全。",
-        affects: "交通圖層 +，高齡在地居民 +"
-      },
-      {
-        type: "remove",
-        code: "拆",
-        title: "中華陸橋拆除",
-        lat: 22.9702,
-        lng: 120.2198,
-        evidence: "第 140-142 頁：中華東路三段中華陸橋拆除，改設號誌化四叉路口；簡報另列主橋拆除工序。",
-        policyMeaning: "大型立體設施拆除會釋放地面空間，也牽涉交通維持與施工干擾。",
-        affects: "交通圖層 +，輿論報導 +，青年在地居民 -"
-      }
-    ];
-
-    const plantingNotes = [
-      {
-        type: "planting",
-        code: "植",
-        title: "新住民家鄉植栽 / 可食地景",
-        lat: 23.0265,
-        lng: 120.2045,
-        evidence: "第 49 頁：北段北提到新住民家鄉植栽地景、可食地景、社區生活場域。",
-        policyMeaning: "植栽不是只做遮蔭，也可轉成社區認同與共管議題。",
-        affects: "植栽圖層 +，青年在地居民 +"
-      },
-      {
-        type: "planting",
-        code: "農",
-        title: "三校城市農場 / 水廊教育",
-        lat: 23.0108,
-        lng: 120.2120,
-        evidence: "第 52 頁：三校共構段提到城市農場花園、微氣候調適、水廊教育空間。",
-        policyMeaning: "可讓植栽選項與通學、教育、社區維護連動。",
-        affects: "植栽圖層 +，高齡在地居民 +，青年短居學生 +"
-      },
-      {
-        type: "planting",
-        code: "水",
-        title: "水廊 / LID / 遺構蘊水",
-        lat: 23.0000,
-        lng: 120.2138,
-        evidence: "第 61、63 頁：北段南配置水廊、LID 設施、雨水與伏流水資源。",
-        policyMeaning: "植栽與排水系統應一起呈現，避免只把綠帶視為景觀。",
-        affects: "植栽圖層 +，輿論報導 +"
-      },
-      {
-        type: "planting",
-        code: "蔭",
-        title: "立體綠廊 / 連續面狀遮蔭",
-        lat: 22.9845,
-        lng: 120.2166,
-        evidence: "第 36-37 頁：空中廊道下方連續面狀遮蔭可降低太陽輻射與體感溫度；6m 巷弄增加喬木植栽。",
-        policyMeaning: "此類資訊可支撐遮蔭優先、低矮通透或密植綠廊的政策取捨。",
-        affects: "植栽圖層 +，高齡在地居民 +"
-      },
-      {
-        type: "planting",
-        code: "療",
-        title: "園藝治療 / 林蔭漫步",
-        lat: 22.9792,
-        lng: 120.2180,
-        evidence: "第 88-89 頁：南段中提到戶外健身、園藝治療、古水文環教與地景遊戲。",
-        policyMeaning: "交通寧靜區可與高齡友善、健康活動、慢行舒適連動。",
-        affects: "植栽圖層 +，高齡在地居民 +"
-      }
-    ];
-
-    const designPoints = [
-      {
-        title: "東門圓環改善建議",
-        code: "東",
-        lat: 22.9837,
-        lng: 120.2173,
-        evidence: "工程預算未包含東門圓環交通改善，但簡報提出人行道拓寬、植栽退縮與視線保留建議。",
-        policyMeaning: "可作為步行安全、自行車中繼與路口改善的政策訊號。",
-        affects: "高齡在地居民 +，青年短居學生 +，輿論報導 +"
-      }
-    ];
-
-    function makeMarkerIcon(markerClass, code) {
+    function makeEmojiIcon(emoji, large = false) {
       return L.divIcon({
         className: "",
-        html: `<div class="signal-marker ${markerClass}">${code}</div>`,
-        iconSize: [30, 30],
-        iconAnchor: [15, 15],
+        html: `<div class="emoji-marker ${large ? "large" : ""}">${emoji}</div>`,
+        iconSize: large ? [46, 46] : [30, 30],
+        iconAnchor: large ? [23, 23] : [15, 15],
         popupAnchor: [0, -16]
       });
     }
 
-    function makeFacilityIcon(type, code) {
+    function makeImpactIcon(emoji, animation = "pulse", large = false) {
       return L.divIcon({
         className: "",
-        html: `<div class="facility-marker ${type}">${code}</div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
-        popupAnchor: [0, -16]
+        html: `<div class="impact-marker ${animation} ${large ? "large" : ""}">${emoji}</div>`,
+        iconSize: large ? [52, 52] : [34, 34],
+        iconAnchor: large ? [26, 26] : [17, 17]
       });
     }
 
-    function makeDesignLabelIcon(segment) {
+    function makeRoadIcon(label, variant = "") {
       return L.divIcon({
         className: "",
-        html: `<div class="design-label">${segment.title}<small>${segment.label}</small></div>`,
-        iconSize: [150, 50],
-        iconAnchor: [75, 25],
-        popupAnchor: [0, -22]
+        html: `<div class="road-marker ${variant}">${label}</div>`,
+        iconSize: [44, 28],
+        iconAnchor: [22, 14]
       });
     }
 
-    function makeBoundaryLabelIcon(name) {
+    function makeHousingIcon(label) {
       return L.divIcon({
         className: "",
-        html: `<div class="boundary-label">${name}</div>`,
-        iconSize: [76, 22],
-        iconAnchor: [38, 11]
+        html: `<div class="housing-label">${label}</div>`,
+        iconSize: [46, 30],
+        iconAnchor: [23, 15]
       });
     }
 
-    function popupHtml(marker) {
-      return `
-        <div class="signal-popup">
-          <h3>${marker.title}</h3>
-          <p><b>資料依據：</b>${marker.evidence}</p>
-          <p><b>政策含意：</b>${marker.policyMeaning}</p>
-          <p><b>可能影響：</b>${marker.affects}</p>
-        </div>
-      `;
+    function makeTreeDataIcon(mode) {
+      return L.divIcon({
+        className: "",
+        html: `<div class="tree-data-marker ${mode || ""}"></div>`,
+        iconSize: [12, 12],
+        iconAnchor: [6, 6]
+      });
     }
 
-    function segmentPopupHtml(segment) {
-      return `
-        <div class="signal-popup">
-          <h3>${segment.title}</h3>
-          <p><b>範圍：</b>${segment.label}</p>
-          <p><b>設計方案：</b>${segment.theme}</p>
-          <p><b>依據：</b>${segment.source}</p>
-        </div>
-      `;
+    function makeTrafficDataIcon(station) {
+      const label = `${Math.round(station.groupStrength * 100)}%`;
+      return L.divIcon({
+        className: "",
+        html: `<div class="traffic-data-marker">${label}<br>PCU</div>`,
+        iconSize: [44, 44],
+        iconAnchor: [22, 22]
+      });
     }
 
-    function renderDesignSegments() {
-      designSegments.forEach((segment) => {
-        L.marker(segment.center, {
-          icon: makeDesignLabelIcon(segment),
-          pane: "markerPane"
-        })
-          .bindPopup(segmentPopupHtml(segment), {
-            maxWidth: 300
+    function interpolatePath(path, t) {
+      const segments = [];
+      let total = 0;
+      for (let i = 0; i < path.length - 1; i += 1) {
+        const a = path[i];
+        const b = path[i + 1];
+        const length = Math.hypot(b[0] - a[0], b[1] - a[1]);
+        segments.push({ a, b, length });
+        total += length;
+      }
+
+      let target = total * t;
+      for (const segment of segments) {
+        if (target <= segment.length) {
+          const ratio = segment.length === 0 ? 0 : target / segment.length;
+          return [
+            segment.a[0] + (segment.b[0] - segment.a[0]) * ratio,
+            segment.a[1] + (segment.b[1] - segment.a[1]) * ratio
+          ];
+        }
+        target -= segment.length;
+      }
+      return path[path.length - 1];
+    }
+
+    function seededOffset(index, scale = 0.00046) {
+      const a = Math.sin(index * 12.9898) * 43758.5453;
+      const b = Math.sin(index * 78.233) * 24634.6345;
+      return [
+        ((a - Math.floor(a)) - 0.5) * scale,
+        ((b - Math.floor(b)) - 0.5) * scale
+      ];
+    }
+
+    function corridorPoint(index, total, regular = false) {
+      const t = regular ? (index + 0.5) / total : ((index * 37) % 100) / 100;
+      const base = interpolatePath(allCorridor, Math.min(0.98, Math.max(0.02, t)));
+      const offset = regular ? [0, 0] : seededOffset(index);
+      return [base[0] + offset[0], base[1] + offset[1]];
+    }
+
+    function renderTreePoints(mode) {
+      const data = window.treeData;
+      if (!data || mode === "none") return;
+      const step = mode === "dense" ? 7 : mode === "regular" ? 14 : 22;
+      const limit = mode === "dense" ? 160 : mode === "regular" ? 80 : 50;
+      const emoji = mode === "sparse" ? "🌿" : mode === "regular" ? "🌱" : "🌳";
+      const fs = mode === "dense" ? 16 : mode === "regular" ? 14 : 13;
+      const sample = data.filter((_, i) => i % step === 0).slice(0, limit);
+      sample.forEach((tree) => {
+        L.marker([tree.lat, tree.lng], {
+          icon: L.divIcon({
+            className: "",
+            html: `<div style="font-size:${fs}px;line-height:1;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.35));">${emoji}</div>`,
+            iconSize: [fs + 4, fs + 4],
+            iconAnchor: [(fs + 4) / 2, (fs + 4) / 2]
           })
-          .addTo(designSegmentLayer);
+        })
+          .bindTooltip(`${tree.name}${tree.road ? "｜" + tree.road : ""}`, { direction: "top" })
+          .addTo(sceneLayer);
       });
+    }
 
-      designBoundaries.forEach((boundary) => {
-        const latSpan = 0.0032;
-        const lngSpan = 0.0050;
-        const line = [
-          [boundary.lat - latSpan, boundary.lng - lngSpan],
-          [boundary.lat + latSpan, boundary.lng + lngSpan]
-        ];
+    function addTreeData(scene) {
+      if (!scene.treeMode || scene.treeMode === "none") return;
+      renderTreePoints(scene.treeMode);
+    }
 
-        L.polyline(line, {
-          color: "#2f6f9f",
+    function addCorridorPlants(scene) {
+      if (!scene.corridorPlant) return;
+      const isFlowers = scene.corridorPlant === "flowers";
+      const emojis = isFlowers ? ["🌼", "🌷", "🌱", "🌸"] : ["🌳", "🌲", "🌳", "🌿"];
+      const count = isFlowers ? 36 : 50;
+      for (let i = 0; i < count; i += 1) {
+        const pt = corridorPoint(i + 20, count + 25, false);
+        L.marker(pt, {
+          icon: makeImpactIcon(emojis[i % emojis.length], isFlowers ? "pop" : "float", false),
+          interactive: false
+        }).addTo(sceneLayer);
+      }
+      if (scene.corridorPlant === "flowers") {
+        const mid = corridorPoint(Math.floor(count / 2), count + 25, true);
+        L.marker(mid, {
+          icon: L.divIcon({
+            className: "",
+            html: `<div class="design-label">需持續維護 →<small>植栽管理成本</small></div>`,
+            iconSize: [150, 44],
+            iconAnchor: [75, 22]
+          })
+        }).addTo(sceneLayer);
+      }
+    }
+
+    function addSightlineWarnings(scene) {
+      if (!scene.sightlineWarnings || !scene.sightlineWarnings.length) return;
+      scene.sightlineWarnings.forEach(function(idx) {
+        const pt = intersections[idx];
+        if (!pt) return;
+        L.marker([pt.lat, pt.lng], { icon: makeRoadIcon("視線↓", "warning") })
+          .bindTooltip(pt.name + "｜密植後視線受阻", { direction: "top" })
+          .addTo(sceneLayer);
+      });
+    }
+
+    function addTrafficCountData(scene) {
+      if (!scene.showTrafficCounts) return;
+
+      trafficCountStations.forEach((station) => {
+        const tooltip = `${station.name}｜${station.route}｜${station.pcu.toLocaleString()} PCU/日｜組內相對強度 ${Math.round(station.groupStrength * 100)}%（以本資料 3 站最高 PCU 為 100%）`;
+        L.circle([station.lat, station.lng], {
+          radius: 180 + station.groupStrength * 460,
+          color: "#b84c42",
           weight: 2,
-          opacity: 0.72,
-          dashArray: "6 8",
-          pane: "designPane"
-        }).addTo(designSegmentLayer);
-
-        L.marker([boundary.lat + 0.0024, boundary.lng + 0.0037], {
-          icon: makeBoundaryLabelIcon(boundary.name),
-          pane: "markerPane"
-        }).addTo(designSegmentLayer);
-      });
-
-      [...designFacilities, ...plantingNotes, ...designPoints].forEach((marker) => {
-        L.marker([marker.lat, marker.lng], {
-          icon: makeFacilityIcon(marker.type || "elevated", marker.code)
+          fillColor: "#b84c42",
+          fillOpacity: 0.12 + station.groupStrength * 0.16
         })
-          .bindPopup(popupHtml(marker), { maxWidth: 280 })
-          .bindTooltip(marker.title, {
-            direction: "top",
-            offset: [0, -12]
-          })
-          .addTo(designSegmentLayer);
+          .bindTooltip(tooltip, { direction: "top" })
+          .addTo(sceneLayer);
+
+        L.marker([station.lat, station.lng], { icon: makeTrafficDataIcon(station) })
+          .bindTooltip(tooltip, { direction: "top" })
+          .addTo(sceneLayer);
       });
     }
 
-    function renderMapLayer() {
-      markerLayer.clearLayers();
-      designSegmentLayer.clearLayers();
+    function drawCorridor(scene) {
+      const colorMap = {
+        green: "#2f8f50",
+        blue: "#2387c7",
+        red: "#b84c42",
+        car: "#66726c",
+        traffic: "#2f6f9f",
+        connected: "#2f8f50",
+        mixed: "#3d8b5a",
+        scooter: "#8b5cf6",
+        pedestrian: "#3d8b5a",
+        separated: "#2f6f9f"
+      };
 
-      if (activeMapLayer === "design") {
-        renderDesignSegments();
+      const color = colorMap[scene.corridor] || colorMap.green;
+      const dashArray = scene.corridor === "traffic" ? "10 10" : scene.corridor === "scooter" ? "4 10" : null;
+      const opacity = scene.corridor === "car" ? 0.45 : 0.84;
+      const baseWeight = scene.corridor === "car" ? 7 : 10;
+      const weight = scene.corridorWeight || baseWeight;
+
+      [northCorridor, southCorridor].forEach((path) => {
+        L.polyline(path, {
+          color,
+          weight,
+          opacity,
+          dashArray,
+          lineCap: "round",
+          lineJoin: "round"
+        }).addTo(sceneLayer);
+
+        if (scene.corridor === "separated") {
+          L.polyline(path, {
+            color: "#fffdf7",
+            weight: 3,
+            opacity: 0.88,
+            dashArray: "8 8",
+            lineCap: "round"
+          }).addTo(sceneLayer);
+        }
+
+        if (scene.corridor === "traffic" || scene.showBikeHint) {
+          L.polyline(path.map(([lat, lng]) => [lat + 0.00028, lng - 0.00024]), {
+            color: "#2f6f9f",
+            weight: 4,
+            opacity: 0.86,
+            dashArray: "6 8",
+            lineCap: "round"
+          }).addTo(sceneLayer);
+        }
+      });
+
+      if (scene.corridor === "pedestrian") {
+        L.polygon(elevatedGreenwayBounds, {
+          color: "#3d8b5a",
+          weight: 1,
+          fillColor: "#3d8b5a",
+          fillOpacity: 0.18
+        }).addTo(sceneLayer);
       }
 
-      const layerKeys = activeMapLayer === "all" ? Object.keys(mapLayers) : activeMapLayer === "design" ? [] : [activeMapLayer];
+      if (scene.corridor === "connected" || scene.corridor === "mixed") {
+        L.polygon(elevatedGreenwayBounds, {
+          color: "#3d8b5a",
+          weight: 2,
+          fillColor: "#3d8b5a",
+          fillOpacity: 0.12,
+          dashArray: scene.corridor === "mixed" ? "8 8" : null
+        }).addTo(sceneLayer);
+      }
+    }
 
-      layerKeys.forEach((key) => {
-        const layer = mapLayers[key];
-        layer.markers.forEach((marker) => {
-          L.marker([marker.lat, marker.lng], {
-            icon: makeMarkerIcon(layer.markerClass, marker.code)
-          })
-            .bindPopup(popupHtml(marker), { maxWidth: 280 })
-            .bindTooltip(marker.title, {
-              direction: "top",
-              offset: [0, -12]
-            })
-            .addTo(markerLayer);
+    function addProvidedSites(scene) {
+      if (!scene.showSites) return;
+      youbikeSites.forEach((site) => {
+        L.circleMarker([site.lat, site.lng], {
+          radius: 4,
+          color: "#fffdf7",
+          weight: 2,
+          fillColor: "#d3a13f",
+          fillOpacity: 0.86
+        })
+          .bindTooltip(site.name, { direction: "top" })
+          .addTo(sceneLayer);
+      });
+    }
+
+    function addImpactEffects(scene) {
+      const emojis = scene.impactEmojis || [];
+      if (!emojis.length) return;
+
+      const count = scene.impactCount || 10;
+      for (let i = 0; i < count; i += 1) {
+        const emoji = emojis[i % emojis.length];
+        const point = corridorPoint(i + 3, count + 5, false);
+        L.marker(point, {
+          icon: makeImpactIcon(emoji, scene.impactAnimation || "pulse", scene.impactLarge && i % 5 === 0),
+          interactive: false
+        }).addTo(sceneLayer);
+      }
+    }
+
+    // Intersections in the 立體綠廊 zone (民族路到林森路): indices 3,4,5
+    const elevatedZoneIndices = [3, 4, 5];
+
+    function makeCrossMarker(html, type) {
+      return L.divIcon({
+        className: "",
+        html: `<div class="cross-marker ${type}">${html}</div>`,
+        iconSize: [50, 28],
+        iconAnchor: [25, 14]
+      });
+    }
+
+    function addIntersections(scene) {
+      if (!scene.showIntersections) return;
+
+      intersections.forEach(function(intersection, index) {
+        const mode = scene.showIntersections;
+
+        // Round 4 emoji-based crossing markers
+        if (mode === "r4-car") {
+          L.marker([intersection.lat, intersection.lng], { icon: makeCrossMarker("🚗🛵", "car") })
+            .bindTooltip(intersection.name + "｜汽機車平面通過", { direction: "top" })
+            .addTo(sceneLayer);
+          return;
+        }
+        if (mode === "r4-bike") {
+          L.marker([intersection.lat, intersection.lng], { icon: makeCrossMarker("🚲🚶", "bike") })
+            .bindTooltip(intersection.name + "｜禁止汽機車穿越", { direction: "top" })
+            .addTo(sceneLayer);
+          return;
+        }
+        if (mode === "r4-mixed") {
+          if (elevatedZoneIndices.includes(index)) {
+            L.marker([intersection.lat, intersection.lng], { icon: makeCrossMarker("⬆️🚲", "elevated") })
+              .bindTooltip(intersection.name + "｜立體綠廊高架化", { direction: "top" })
+              .addTo(sceneLayer);
+          } else {
+            L.marker([intersection.lat, intersection.lng], { icon: makeCrossMarker("🚗🛵", "car") })
+              .bindTooltip(intersection.name + "｜汽機車平面通過", { direction: "top" })
+              .addTo(sceneLayer);
+          }
+          return;
+        }
+        if (mode === "r4-scooter") {
+          L.marker([intersection.lat, intersection.lng], { icon: makeCrossMarker("🛴", "scooter") })
+            .bindTooltip(intersection.name + "｜電動平衡車通道", { direction: "top" })
+            .addTo(sceneLayer);
+          return;
+        }
+
+        // Legacy modes for other rounds
+        let label = "車";
+        let variant = "";
+        if (mode === "greenway-only") { label = "🚲禁車"; variant = "safe"; }
+        else if (mode === "mixed-split") {
+          label = elevatedZoneIndices.includes(index) ? "🚲" : "車";
+          variant = elevatedZoneIndices.includes(index) ? "safe" : "";
+        } else if (mode === "continuous") { label = "綠"; variant = "safe"; }
+        else if (mode === "points") { label = "口"; variant = ""; }
+
+        L.marker([intersection.lat, intersection.lng], { icon: makeRoadIcon(label, variant) })
+          .bindTooltip(intersection.name, { direction: "top" })
+          .addTo(sceneLayer);
+      });
+    }
+
+    function addConflictPoints(scene) {
+      if (!scene.conflictPoints || !scene.conflictPoints.length) return;
+      scene.conflictPoints.forEach(function(cp) {
+        const pt = intersections[cp.index];
+        if (!pt) return;
+        const isExplosion = cp.style === "explosion";
+        const emoji = isExplosion ? "💥" : "⚠️";
+        L.marker([pt.lat, pt.lng], {
+          icon: L.divIcon({
+            className: "",
+            html: `<div class="impact-marker ${isExplosion ? "shake" : "pulse"}" style="font-size:20px;width:36px;height:36px;">${emoji}</div>`,
+            iconSize: [36, 36],
+            iconAnchor: [18, 18]
+          }),
+          interactive: true
+        })
+          .bindTooltip(pt.name + (isExplosion ? "｜高衝突風險" : "｜中等衝突風險"), { direction: "top" })
+          .addTo(sceneLayer);
+      });
+    }
+
+    function addSidewalk(scene) {
+      if (!scene.showSidewalk) return;
+      const data = window.sidewalkData;
+      if (!data || !data.features) return;
+      if (sidewalkLayerGroup) { map.removeLayer(sidewalkLayerGroup); sidewalkLayerGroup = null; }
+      sidewalkLayerGroup = L.geoJSON(data, {
+        style: { color: "#3d8b5a", weight: 1, fillColor: "#3d8b5a", fillOpacity: 0.22, opacity: 0.5 }
+      }).addTo(map);
+    }
+
+    function addBridges(scene) {
+      if (!scene.showBridges) return;
+      const isR4 = scene.showIntersections && scene.showIntersections.startsWith("r4");
+      bridgeNodes.forEach((bridge) => {
+        const icon = isR4
+          ? L.divIcon({ className: "", html: `<div class="cross-marker elevated">🌉高架</div>`, iconSize: [66, 28], iconAnchor: [33, 14] })
+          : makeRoadIcon("橋", "safe");
+        L.marker([bridge.lat, bridge.lng], { icon })
+          .bindTooltip(bridge.name + "｜高架連通點", { direction: "top" })
+          .addTo(sceneLayer);
+      });
+    }
+
+    function featureInBounds(feature) {
+      const coords = feature.geometry && feature.geometry.coordinates;
+      if (!coords) return false;
+      const lng = coords[0];
+      const lat = coords[1];
+      return lat > 22.94 && lat < 23.04 && lng > 120.18 && lng < 120.24;
+    }
+
+    function housingEmoji(feature, mode) {
+      const type = feature.properties && feature.properties.type;
+      const pct = (feature.properties && feature.properties.percentile) || 0;
+      const base = type === "住宅大樓" ? "🏢" : type === "透天厝" ? "🏠" : type === "華廈" ? "🏘️" : "🏚️";
+      if (mode === "protected") return pct > 0.65 ? base + "＝" : "🛡️";
+      if (mode === "develop") return pct > 0.65 ? base + "↑" : base + "↓";
+      if (mode === "cyber") return "🏙️";
+      return base;
+    }
+
+    function loadHousingPointsThenRender(mode) {
+      if (housingPointData) {
+        renderHousingPoints(mode);
+        return;
+      }
+
+      if (window.housingPointsData) {
+        housingPointData = window.housingPointsData;
+        renderHousingPoints(mode);
+        return;
+      }
+
+      if (housingFetchStarted) return;
+      housingFetchStarted = true;
+
+      fetch("材料/housing_points.geojson")
+        .then((response) => response.json())
+        .then((geojson) => {
+          housingPointData = geojson;
+          if (cardScenes[activeSceneId].housing) renderHousingPoints(cardScenes[activeSceneId].housing);
+        })
+        .catch(() => {
+          L.marker([22.996928, 120.213176], { icon: makeHousingIcon("房價資料未載入") })
+            .bindTooltip("若以 file:// 開啟，瀏覽器可能阻擋 GeoJSON fetch；請用本機 server 測試。", { direction: "top" })
+            .addTo(sceneLayer);
         });
+    }
+
+    function renderHousingPoints(mode) {
+      if (!housingPointData || !housingPointData.features) return;
+      const filtered = housingPointData.features.filter(featureInBounds);
+      // Use consistent sampling for all modes so heat map distribution looks identical
+      const sample = filtered.filter((_, index) => index % 18 === 0).slice(0, 42);
+
+      sample.forEach((feature) => {
+        const coords = feature.geometry.coordinates;
+        const label = housingEmoji(feature, mode);
+        L.marker([coords[1], coords[0]], { icon: makeHousingIcon(label) })
+          .bindTooltip(`${feature.properties.type || "建物"}｜${Math.round((feature.properties.percentile || 0) * 100)}%`, { direction: "top" })
+          .addTo(sceneLayer);
       });
 
-      const legend = document.getElementById("mapLegend");
-      if (activeMapLayer === "all") {
-        legend.innerHTML = `
-          <strong>全部政策訊號</strong>
-          <p>同時顯示植栽、交通與房價訊號，用來檢查資訊密度是否會壓過底圖。</p>
-        `;
-      } else if (activeMapLayer === "design") {
-        legend.innerHTML = `
-          <strong>設計路段</strong>
-          <p>依綠園道設計簡報框選北段、車站段與南段的主要設計方案。線位為政策示意，非正式工程邊界。</p>
-        `;
-      } else {
-        const layer = mapLayers[activeMapLayer];
-        legend.innerHTML = `
-          <strong>${layer.title}</strong>
-          <p>${layer.note}</p>
-        `;
+      if (mode === "cyber") {
+        stations.slice(1, 3).forEach((station) => {
+          L.marker([station.lat, station.lng], { icon: makeEmojiIcon("🏙️", true) })
+            .bindTooltip("賽博龐克大樓示意", { direction: "top" })
+            .addTo(sceneLayer);
+        });
+      }
+    }
+
+    function addHousing(scene) {
+      if (!scene.housing) return;
+
+      if (activeHeatLayer) {
+        map.removeLayer(activeHeatLayer);
+        activeHeatLayer = null;
       }
 
-      ["plant", "traffic", "housing", "design", "all"].forEach((key) => {
-        document.getElementById(`layer-${key}`).classList.toggle("active", key === activeMapLayer);
+      const heatData = typeof housingHeatData !== "undefined" ? housingHeatData : window.housingHeatData;
+
+      if (heatData && window.L && L.heatLayer) {
+        const options = {
+          radius: 22,
+          blur: 18,
+          maxOpacity: 0.5,
+          gradient: { 0.25: "#3b82f6", 0.65: "#facc15", 1: "#ef4444" }
+        };
+        activeHeatLayer = L.heatLayer(heatData, options).addTo(map);
+      } else if (scene.housing) {
+        L.marker([22.996928, 120.213176], { icon: makeHousingIcon("heat 未載入") })
+          .bindTooltip("Leaflet.heat 或 housing_heat.js 未載入，仍會嘗試顯示房價點位。", { direction: "top" })
+          .addTo(sceneLayer);
+      }
+
+      loadHousingPointsThenRender(scene.housing);
+    }
+
+    function clearScene() {
+      sceneLayer.clearLayers();
+      if (activeHeatLayer) { map.removeLayer(activeHeatLayer); activeHeatLayer = null; }
+      if (sidewalkLayerGroup) { map.removeLayer(sidewalkLayerGroup); sidewalkLayerGroup = null; }
+      document.getElementById("mapTint").className = "map-tint";
+      document.getElementById("impactBand").className = "impact-band";
+    }
+
+    function renderPolicyMapScene(sceneId, shouldLock = false) {
+      const scene = cardScenes[sceneId] || cardScenes["vision-rest"];
+      activeSceneId = sceneId;
+      if (shouldLock) lockedSceneId = sceneId;
+      clearScene();
+
+      const tint = document.getElementById("mapTint");
+      if (scene.tint) tint.classList.add(scene.tint);
+      // impact-band disabled — diagonal patterns obscure map data
+
+      drawCorridor(scene);
+      addSidewalk(scene);
+      addTreeData(scene);
+      addCorridorPlants(scene);
+      addSightlineWarnings(scene);
+      addTrafficCountData(scene);
+      addProvidedSites(scene);
+      addIntersections(scene);
+      addConflictPoints(scene);
+      addBridges(scene);
+      addHousing(scene);
+      addImpactEffects(scene);
+
+      document.getElementById("mapSceneStatus").innerHTML = `
+        <strong>${scene.round}｜${scene.title}</strong>
+        <span>單一動態圖層：目前依這張卡牌重繪地圖內容。</span>
+      `;
+      const heatLegendHtml = scene.housing ? `
+          <div class="legend-row">
+            <b>房價壓力色階</b>
+            <div class="heat-legend-bar"></div>
+            <div class="heat-legend-labels"><span>低</span><span>中</span><span>高</span></div>
+          </div>` : "";
+
+      const crossLegendHtml = scene.showIntersections && scene.showIntersections.startsWith("r4") ? `
+          <div class="legend-row">
+            <b>路口類型</b>
+            <span>
+              <span class="cross-marker car" style="display:inline-flex;margin-right:5px;">🚗🛵</span>汽機車平面通過
+              <span class="cross-marker bike" style="display:inline-flex;margin-right:5px;">🚲🚶</span>禁止汽機車
+              <span class="cross-marker elevated" style="display:inline-flex;margin-right:5px;">⬆️🚲</span>高架化
+              ${scene.showIntersections === "r4-scooter" ? '<br><span class="cross-marker scooter" style="display:inline-flex;margin-right:5px;">🛴</span>電動平衡車通道' : ""}
+            </span>
+          </div>` : "";
+
+      document.getElementById("mapLegend").innerHTML = `
+        <strong>${scene.title}</strong>
+        <div class="legend-block">
+          <div class="legend-row">
+            <b>資料依據</b>
+            <span>${scene.dataLegend || "本卡牌只調整政策視覺狀態，未新增外部資料點。"}</span>
+          </div>
+          ${heatLegendHtml}
+          ${crossLegendHtml}
+          <div class="legend-row">
+            <b>政策衝擊示意</b>
+            <span>${scene.impactLegend || scene.legend}</span>
+          </div>
+        </div>
+      `;
+
+      document.querySelectorAll(".scene-card").forEach((button) => {
+        button.classList.toggle("active", button.dataset.sceneId === lockedSceneId);
       });
     }
 
-    function setMapLayer(layerKey) {
-      activeMapLayer = layerKey;
-      renderMapLayer();
+    function renderSceneCards() {
+      const container = document.getElementById("sceneCards");
+      container.innerHTML = sceneOrder.map((sceneId) => {
+        const scene = cardScenes[sceneId];
+        return `
+          <button class="scene-card" type="button" data-scene-id="${sceneId}">
+            <small>${scene.round}</small>
+            <b>${scene.title}</b>
+          </button>
+        `;
+      }).join("");
+
+      container.querySelectorAll(".scene-card").forEach((button) => {
+        button.addEventListener("mouseenter", () => renderPolicyMapScene(button.dataset.sceneId, false));
+        button.addEventListener("mouseleave", () => renderPolicyMapScene(lockedSceneId, false));
+        button.addEventListener("click", () => renderPolicyMapScene(button.dataset.sceneId, true));
+      });
     }
 
     function refreshMapLayout() {
@@ -1212,11 +2071,8 @@
 
     mapResizeObserver.observe(mapZone);
 
-    corridorLayer.bindTooltip("台南鐵路綠廊道示意主軸", {
-      sticky: true
-    });
-
-    renderMapLayer();
+    renderSceneCards();
+    renderPolicyMapScene("vision-rest", true);
     requestAnimationFrame(() => {
       refreshMapLayout();
       map.fitBounds(greenwayBounds, { animate: false });

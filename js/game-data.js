@@ -80,39 +80,4 @@ const eventFlow = [
     ];
 
 
-    const mapLayers = {
-      plant: {
-        title: "植栽圖層",
-        note: "假資料：標示目前遮蔭不足、可補植與需要維護的綠廊節點。",
-        markerClass: "plant",
-        markers: [
-          { x: 18, y: 60, label: "遮蔭不足", code: "蔭" },
-          { x: 38, y: 46, label: "可補植喬木", code: "樹" },
-          { x: 62, y: 52, label: "夜間修剪", code: "修" },
-          { x: 80, y: 42, label: "公園串接", code: "園" }
-        ]
-      },
-      traffic: {
-        title: "交通圖層",
-        note: "假資料：標示通勤節點、人車衝突路口與自行車動線缺口。",
-        markerClass: "traffic",
-        markers: [
-          { x: 14, y: 54, label: "路口衝突", code: "衝" },
-          { x: 34, y: 45, label: "轉乘節點", code: "轉" },
-          { x: 56, y: 50, label: "通勤站", code: "站" },
-          { x: 72, y: 58, label: "自行車缺口", code: "騎" }
-        ]
-      },
-      housing: {
-        title: "房價圖層",
-        note: "假資料：標示租屋敏感區、房價壓力區與社宅串接節點。",
-        markerClass: "housing",
-        markers: [
-          { x: 26, y: 50, label: "租屋敏感", code: "租" },
-          { x: 42, y: 44, label: "小東社宅", code: "社" },
-          { x: 60, y: 54, label: "增值壓力", code: "價" },
-          { x: 78, y: 42, label: "商圈外溢", code: "商" }
-        ]
-      }
-    };
 

@@ -17,9 +17,6 @@ const maxTurns = eventFlow.length;
     const initialState = { ...state };
 
 
-    let activeMapLayer = "plant";
-
-
     function clamp(value) {
       return Math.max(0, Math.min(100, Math.round(value)));
     }
@@ -47,31 +44,10 @@ const maxTurns = eventFlow.length;
       selectedPolicy = fallback ? fallback.key : null;
     }
 
-    function renderMapLayer() {
-      const layer = mapLayers[activeMapLayer];
-      document.getElementById("mapLayerData").innerHTML = layer.markers.map(marker => `
-        <div class="map-marker ${layer.markerClass}" style="left:${marker.x}%; top:${marker.y}%;">
-          ${marker.code}
-          <span>${marker.label}</span>
-        </div>
-      `).join("");
-      document.getElementById("mapLegend").innerHTML = `
-        <strong>${layer.title}</strong>
-        <p>${layer.note}</p>
-      `;
-      Object.keys(mapLayers).forEach(key => {
-        document.getElementById(`layer-${key}`).classList.toggle("active", key === activeMapLayer);
-      });
-    }
-
-    function setMapLayer(layerKey) {
-      activeMapLayer = layerKey;
-      renderMapLayer();
-    }
-
     function startGame() {
       document.getElementById("introScreen").classList.add("hidden");
       document.getElementById("gameScreen").classList.remove("hidden");
+      if (window.initMap) { window.initMap(); window.updatePolicyMap(selectedPolicy); }
       renderAll();
       renderCurrentEvent();
     }
@@ -80,7 +56,11 @@ const maxTurns = eventFlow.length;
       const node = currentNode();
       ensureAffordableSelection();
       document.getElementById("policyHand").innerHTML = node.options.map(option => `
-        <button class="policy-tile ${option.key === selectedPolicy ? "active" : ""}" onclick="selectPolicy('${option.key}')" ${canAfford(option) ? "" : "disabled"}>
+        <button class="policy-tile ${option.key === selectedPolicy ? "active" : ""}"
+          onclick="selectPolicy('${option.key}')"
+          onmouseenter="if(window.previewPolicyMap)window.previewPolicyMap('${option.key}')"
+          onmouseleave="if(window.restorePolicyMap)window.restorePolicyMap()"
+          ${canAfford(option) ? "" : "disabled"}>
           <span class="tile-char">${option.char}</span>
           <strong>${option.title}</strong>
           <small>cost ${option.cost}｜${option.desc}</small>
@@ -183,7 +163,7 @@ const maxTurns = eventFlow.length;
     function renderAll() {
       renderPolicyHand();
       renderAgentWall(getOption(selectedPolicy), "preview");
-      renderMapLayer();
+      if (window.updatePolicyMap) window.updatePolicyMap(selectedPolicy);
     }
 
     function selectPolicy(key) {
@@ -192,6 +172,7 @@ const maxTurns = eventFlow.length;
       selectedPolicy = key;
       renderPolicyHand();
       renderAgentWall(getOption(selectedPolicy), "preview");
+      if (window.updatePolicyMap) window.updatePolicyMap(key);
     }
 
     function getOption(key) {
@@ -237,6 +218,7 @@ const maxTurns = eventFlow.length;
       }
       applyChoice(option);
       applyAgentReactions(option);
+      if (window.updatePolicyMap) window.updatePolicyMap(option.key);
 
       const summary = makeFeedbackSummary(option);
       path.push(option.title);
@@ -389,6 +371,7 @@ const maxTurns = eventFlow.length;
       document.getElementById("resultScreen").classList.add("hidden");
       document.getElementById("introScreen").classList.remove("hidden");
       document.getElementById("gameScreen").classList.add("hidden");
+      if (window.updatePolicyMap) window.updatePolicyMap(eventFlow[0].options[0].key);
       document.getElementById("roundTitle").innerHTML = formatRoundTitle("第一局：綠廊尚未被解讀");
       document.getElementById("roundText").textContent = "請從下方選擇本輪選項，再按「確認選擇」推進事件樹。";
       renderAll();

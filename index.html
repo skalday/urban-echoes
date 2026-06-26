@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>都市的聲音｜台南鐵路綠廊道政策牌局</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 <body>
   <section class="screen intro" id="introScreen">
@@ -37,19 +38,14 @@
     <div class="game-table">
       <section class="left-zone">
         <main class="map-zone">
-          <div class="map-layer-tabs">
-            <button class="active" id="layer-plant" onclick="setMapLayer('plant')">植栽圖層</button>
-            <button id="layer-traffic" onclick="setMapLayer('traffic')">交通圖層</button>
-            <button id="layer-housing" onclick="setMapLayer('housing')">房價圖層</button>
+          <div id="map"></div>
+          <div class="map-tint" id="mapTint"></div>
+          <div class="impact-band" id="impactBand"></div>
+          <div class="map-scene-status" id="mapSceneStatus">
+            <strong>地圖載入中…</strong>
+            <span>選擇政策牌後地圖自動更新。</span>
           </div>
-          <div class="map-grid"></div>
-          <div class="corridor"></div>
-          <div class="map-layer-data" id="mapLayerData"></div>
           <div class="map-legend" id="mapLegend"></div>
-          <div class="node n1"><span>實踐街路口</span></div>
-          <div class="node n2"><span>小東社宅</span></div>
-          <div class="node n3"><span>林森通勤站</span></div>
-          <div class="node n4"><span>崇賢公園</span></div>
         </main>
         <div class="round-message">
           <h2 id="roundTitle">【第一局】<br>綠廊尚未被解讀</h2>
@@ -124,6 +120,13 @@
     </div>
   </section>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <script src="材料/housing_heat.js"></script>
+  <script src="材料/housing_points.js"></script>
+  <script src="材料/tree_data.js"></script>
+  <script src="材料/sidewalk_data.js"></script>
+  <script src="js/map.js"></script>
   <script src="js/game-data.js"></script>
   <script src="js/agent-reactions.js"></script>
   <script src="js/results.js"></script>
